@@ -1,0 +1,9 @@
+name: DelayRevive
+main: neo.main.Main
+version: 1.0
+api-version: 1.18
+author: hamtser
+commands:
+  부활단축:
+    usage: /<command>
+    description: 설명
