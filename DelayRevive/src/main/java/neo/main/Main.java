@@ -10,7 +10,7 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         data = new DataManager(this);
-        getServer().getPluginManager().registerEvents(new EventListener(), this);
+        getServer().getPluginManager().registerEvents(new EventListener(this), this);
         getCommand("부활단축").setExecutor(new Commands());
     }
 
