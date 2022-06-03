@@ -9,10 +9,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="04ee08e3-898f-4ddd-a937-2d31466c9bf4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/neo/command/Commands.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/neo/command/Commands.java" afterDir="false" />
+    <list default="true" id="0cd3f115-5846-4513-9c08-d1c6c3bf8093" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/src/main/java/neo/event/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/neo/event/EventListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/neo/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/neo/main/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
