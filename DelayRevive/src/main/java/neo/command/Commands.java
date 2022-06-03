@@ -40,9 +40,13 @@ public class Commands implements CommandExecutor {
                                     return true;
                                 }
                                 // data.yml에 추가
-                                data.getFile().set("reviveShorten." + nickName + ".count", count);
+                                int revive_count = data.getFile().getInt("reviveShorten." + nickName + ".count");
+                                int sum_count = revive_count+count;
+                                data.getFile().set("reviveShorten." + nickName + ".count", sum_count);
                                 data.saveConfig();
-                                p.sendMessage(ChatColor.GREEN + nickName + "의 부활 단축 횟수가 " + count + "로 지정되었습니다.");
+                                p.sendMessage(ChatColor.GREEN + nickName + "의 남은 부활 단축 횟수는 총 " + sum_count + "개 입니다.");
+                                Bukkit.getPlayer(nickName).sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "부활 단축 횟수가 " + count + "개 추가되었습니다. " +
+                                        ChatColor.GOLD + "총 남은 갯수: " + sum_count +"개");
                                 return true;
                             } else if (arg.equals("제거")) {
                                 String nickName = args[1];
@@ -64,7 +68,9 @@ public class Commands implements CommandExecutor {
                                     data.getFile().set("reviveShorten." + nickName + ".count", revive_count);
                                     data.saveConfig();
                                 }
-                                p.sendMessage(ChatColor.GREEN + "부활 단축을 완료했습니다." + ChatColor.GOLD + nickName + "님의 남은 부활 단축 갯수: " + revive_count + "개");
+                                p.sendMessage(ChatColor.GREEN + "부활 단축 제거를 완료했습니다." + ChatColor.GOLD + nickName + "님의 남은 부활 단축 갯수: " + revive_count + "개");
+                                Bukkit.getPlayer(nickName).sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "부활 단축 횟수가 " + count + "개 제거되었습니다. " +
+                                        ChatColor.GOLD + "총 남은 갯수: " + revive_count +"개");
                                 return true;
                             }
                         }else{
