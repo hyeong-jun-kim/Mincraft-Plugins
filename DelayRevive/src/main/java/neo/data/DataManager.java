@@ -20,6 +20,7 @@ public class DataManager {
     public DataManager(Main plugin){
         this.plugin = plugin;
         saveDefaultconfig();
+        reloadFile();
     }
 
     public void reloadFile() {
@@ -32,6 +33,11 @@ public class DataManager {
         if(defaultStream!=null) {
             YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
             dataFile.setDefaults(defaultConfig);
+        }
+        // 부활 대기시간 조정
+        if(dataFile.get("revive.time") == null){
+            dataFile.set("revive.time", 3600 * 1000);
+            saveConfig();
         }
     }
     public FileConfiguration getFile() {
