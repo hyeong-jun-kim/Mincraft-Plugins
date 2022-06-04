@@ -55,13 +55,13 @@ public class EventListener implements Listener {
                 data.getFile().set("reviveShorten." + name + ".count", count);
                 data.saveConfig();
             }
-            p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD+ "당신은 죽었습니다 !", "부활 단축 남은 횟수 " +count +"회",10, 200, 20);
+            p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD+ "당신은 죽었습니다 !", "부활 단축 남은 횟수 " +count +"회",10, 100, 20);
             // 10분 뒤에 부활 (타이머 이용)
             data.getFile().set(name+".revive.time", System.currentTimeMillis() + 1000 * SHORT_REVIVE_TIME);
             data.saveConfig();
             playerRevive(p, 20 * SHORT_REVIVE_TIME);
         }else{
-            p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD+ "당신은 죽었습니다 !", "한시간 후에 자동으로 부활합니다",10, 200, 20);
+            p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD+ "당신은 죽었습니다 !", "한시간 후에 자동으로 부활합니다",10, 100, 20);
             long reviveTime = data.getFile().getLong("revive.time"); // 부활시간 가져오기
             data.getFile().set(name+".revive.time", System.currentTimeMillis() + reviveTime);
             data.saveConfig();
@@ -80,7 +80,7 @@ public class EventListener implements Listener {
             if (data.getFile().contains(name + ".revive.time")) {
                 long time = data.getFile().getLong(name + ".revive.time");
                 if (time >= System.currentTimeMillis()) { // 부활 딜레이가 안지났으면 타이틀 메시지 출력
-                    p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD+ "부활 !", "",10, 200, 20);
+                    p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD+ "부활 !", "",10, 100, 20);
                     data.getFile().set(name+".revive.time", null);
                     data.saveConfig();
                 }
@@ -132,7 +132,7 @@ public class EventListener implements Listener {
                 p.spigot().respawn();
                 p.teleport(loc);
                 p.setGameMode(GameMode.SURVIVAL);
-                p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD+ "부활 !", "",10, 200, 20);
+                p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD+ "부활 !", "",10, 100, 20);
                 if(reviveTask.containsKey(p.getName())){
                     reviveTask.remove(p.getName());
                 }
