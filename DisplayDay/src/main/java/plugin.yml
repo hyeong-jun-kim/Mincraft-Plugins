@@ -1,0 +1,9 @@
+name: DisplayDay
+main: neo.main.Main
+version: 1.0
+api-version: 1.18
+author: hamtser
+commands:
+  날짜:
+   usage: /날짜 초기화
+   description: 월드의 시간을 초기화 합니다.

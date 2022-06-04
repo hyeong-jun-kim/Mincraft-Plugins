@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="DisplayDay">
+    <output-path>$PROJECT_DIR$/../../서버/plugins</output-path>
+    <root id="archive" name="DisplayDay.jar">
+      <element id="module-output" name="template" />
+      <element id="file-copy" path="$PROJECT_DIR$/data.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/java/plugin.yml" />
+    </root>
+  </artifact>
+</component>
