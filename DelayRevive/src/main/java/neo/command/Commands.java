@@ -21,6 +21,14 @@ public class Commands implements CommandExecutor {
             Player p = (Player)sender;
             if(label.equals("부활단축")){
                 switch(args.length) {
+                    case 0:
+                        if (p.isOp()) {
+                            p.sendMessage(ChatColor.GREEN + "----------------------------------------------------");
+                            p.sendMessage(ChatColor.YELLOW + "/부활단축 추가 <닉네임> <갯수>" + ChatColor.WHITE + " - 해당 유저의 부활단축을 <갯수>만큼 추가합니다.");
+                            p.sendMessage(ChatColor.YELLOW + "/부활단축 제거 <닉네임> <갯수>" + ChatColor.WHITE + " - 해당 유저의 부활단축을 <갯수>만큼 제거합니다.");
+                            p.sendMessage(ChatColor.GREEN + "----------------------------------------------------");
+                            return true;
+                        }
                     case 3:
                         if (p.isOp()) {
                             String arg = args[0];
