@@ -39,7 +39,7 @@ public class Main extends JavaPlugin {
                 if(currentDayTime > dayTime){
                     dayTime = currentDayTime;
                     for(Player p : Bukkit.getOnlinePlayers()){
-                        p.sendTitle(ChatColor.BOLD + "" + ChatColor.WHITE + "DAY " + dayTime, "", 10, 100, 20);
+                        p.sendTitle(ChatColor.BOLD + "" + ChatColor.WHITE + "Day " + dayTime, "", 10, 100, 20);
                     }
                 }
             }

@@ -19,6 +19,11 @@ public class Commands implements CommandExecutor {
             if (p.isOp()) {
                 if (label.equals("날짜")) {
                     switch (args.length) {
+                        case 0:
+                            p.sendMessage(ChatColor.GREEN + "----------------------------------------------------");
+                            p.sendMessage(ChatColor.YELLOW + "/날짜 초기화" + ChatColor.WHITE + " - 월드의 날짜를 0일로 초기화 합니다.");
+                            p.sendMessage(ChatColor.GREEN + "----------------------------------------------------");
+                            return true;
                         case 1:
                             if (args[0].equals("초기화")) {
                                 Main.dayTime = 0L;
