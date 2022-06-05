@@ -27,7 +27,7 @@ public class Commands implements CommandExecutor {
                     if(p.isOp()){
                         // 초대권 생성
                         if(args[0].equals("생성")){
-                            if(!p.getInventory().isEmpty()){
+                            if(p.getInventory().firstEmpty() == -1){
                                 p.sendMessage(ChatColor.RED + "인벤토리 슬롯을 비워주세요!");
                                 return true;
                             }
