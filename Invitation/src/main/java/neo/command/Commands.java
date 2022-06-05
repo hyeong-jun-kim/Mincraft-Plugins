@@ -7,6 +7,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -46,8 +47,20 @@ public class Commands implements CommandExecutor {
                         int count = invitation.getAmount();
                         ItemMeta itemMeta = invitation.getItemMeta();
                         if (itemMeta != null && itemMeta.getDisplayName().equals(ChatColor.GOLD + "초대권")) {
-                            boolean check = false;
+                            //boolean check = false;
                             String nickName = args[1];
+                            // 화이트 리스트에 추가됐는지 체크
+                            for(OfflinePlayer op: Bukkit.getWhitelistedPlayers()){
+                                if(op.getName().equals(nickName)){
+                                    p.sendMessage(ChatColor.RED + "이미 화이트리스트에 등록된 유저입니다!");
+                                    return true;
+                                }
+                            }
+                            // 화이트 리스트 명령어로 추가하기
+                            ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
+                            String command = "whitelist add " + nickName;
+                            Bukkit.dispatchCommand(console, command);
+                            /*
                             for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
                                 if(offlinePlayer.getName() != null) {
                                     if (offlinePlayer.getName().equals(nickName)) {
@@ -59,7 +72,7 @@ public class Commands implements CommandExecutor {
                             if (!check) {
                                 p.sendMessage(ChatColor.RED + "존재하지 않는 유저 닉네임입니다.");
                                 return true;
-                            }
+                            }*/
                             p.getInventory().remove(invitation);
                             p.getInventory().setItemInMainHand(createInvitation(count - 1));
                             p.sendMessage(ChatColor.GOLD + nickName + ChatColor.GREEN + "님이 화이트 리스트로 추가되셨습니다!");
