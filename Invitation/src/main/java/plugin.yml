@@ -1,0 +1,9 @@
+name: Invitation
+main: neo.main.Main
+version: 1.0
+api-version: 1.18
+author: hamtser
+commands:
+  초대권:
+    usage: /초대권
+    description: 초대권을 생성하거나 사용합니다.
