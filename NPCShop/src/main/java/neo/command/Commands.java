@@ -23,6 +23,10 @@ public class Commands implements CommandExecutor {
                                 String npcName = args[1];
                                 shop.createShop(p, npcName);
                                 return true;
+                            }else if(args[0].equals("삭제")){
+                                String npcName = args[1];
+                                shop.deleteShop(p, npcName);
+                                return true;
                             }
                     }
                 }

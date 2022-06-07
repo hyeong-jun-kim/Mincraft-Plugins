@@ -2,6 +2,7 @@ package neo.main;
 import neo.command.Commands;
 import neo.data.DataManager;
 import neo.event.EventListener;
+import neo.shop.Shop;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
@@ -12,8 +13,9 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         data = new DataManager(this);
-//        getServer().getPluginManager().registerEvents(new EventListener(), this);
+        getServer().getPluginManager().registerEvents(new EventListener(), this);
         getCommand("상점").setExecutor(new Commands());
+
     }
 
     @Override
