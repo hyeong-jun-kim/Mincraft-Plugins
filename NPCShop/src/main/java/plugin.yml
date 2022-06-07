@@ -1,0 +1,9 @@
+name: NPCShop
+main: neo.main.Main
+version: 1.0
+api-version: 1.18
+author: hamtser
+commands:
+  상점:
+    usage: /상점
+    description: 상점을 생성한다
