@@ -5,27 +5,98 @@ import dev.sergiferry.playernpc.api.NPCLib;
 import neo.data.DataManager;
 import neo.main.Main;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 public class Shop {
     Main plugin = Main.getPlugin();
     DataManager data = Main.getData();
-    public void createShop(Player p, String npcName){
-        NPC.Personal npc = NPCLib.getInstance().generatePersonalNPC(p, plugin, npcName, p.getLocation());
-        npc.setText(ChatColor.GREEN + npcName, ChatColor.GOLD + "상인");
-        npc.setFollowLookType(NPC.FollowLookType.PLAYER);
-        data.getFile().set("npc.name", npcName);
-        data.getFile().set("npc.location", p.getLocation());
-        data.saveConfig();
-        npc = setNPCRandomSkin(npc);
-        npc.create();
-        npc.show();
-        p.sendMessage(ChatColor.GREEN + "정상적으로 상점이 생성되었습니다!");
+    // NPC 생성
+    public void createShop(Player p, String npcName) {
+        if (!data.getFile().contains("npc." + npcName)) {
+            NPC.Global npc = NPCLib.getInstance().generateGlobalNPC(plugin, npcName, p.getLocation());
+//            NPC.Personal npc = NPCLib.getInstance().generatePersonalNPC(p, plugin, npcName, p.getLocation());
+            npc.setFollowLookType(NPC.FollowLookType.PLAYER);
+            data.getFile().set("npc." + npcName + ".location", p.getLocation());
+            data.saveConfig();
+            npc = setNPCRandomSkin(npc, npcName);
+            npc.setText(ChatColor.AQUA + npcName, ChatColor.GOLD + "상인");
+            npc.setAutoCreate(true);
+            npc.setAutoShow(true);
+            npc.update();
+            npc.forceUpdateText();
+            p.sendMessage(ChatColor.GREEN + "정상적으로 상점이 생성되었습니다!");
+        }else{
+            p.sendMessage(ChatColor.RED + "이미 존재하는 이름입니다. 다른 이름을 입력해주세요!");
+        }
     }
+    // 상점 삭제
+    public void deleteShop(Player p, String npcName){
+        boolean check = false;
+        Set<NPC.Global> global = NPCLib.getInstance().getAllGlobalNPCs();
+        for(NPC.Global g : global){
+            if(g.getCode().equals("npcshop."+npcName)){
+                NPCLib.getInstance().removeGlobalNPC(g);
+                data.getFile().set("npc." + npcName, null);
+                data.saveConfig();
+                check = true;
+                p.sendMessage(ChatColor.GOLD + npcName + ChatColor.GREEN + "상점이 성공적으로 제거되었습니다!");
+            }
+        }
+        if(!check)
+            p.sendMessage(ChatColor.RED + "존재하지 않는 상점 이름입니다.");
+    }
+    // 상점 아이템 추가
+    public void addShopItem(String npcName, int key, int price, String itemCode, Player p){
+        if (data.getFile().contains("npc." + npcName)) {
+            ItemStack shopItem = p.getInventory().getItemInMainHand();
+            ItemStack buyItem = new ItemStack(Material.getMaterial(itemCode.toUpperCase()));
+            buyItem.setAmount(price);
+            // 추가할 수 있는 아이템 범위가 넘어갈 경우
+            if(key > 5){
+                p.sendMessage(ChatColor.RED + "5 이하의 숫자를 적어주세요!");
+                return;
+            }
+            data.getFile().set("npc." + npcName + ".shop." + key + ".shopItem", shopItem);
+            data.getFile().set("npc." + npcName + ".shop." + key + ".buyItem", buyItem);
+            data.getFile().set("npc." + npcName + ".shop." + key + ".buyCount", 1);
+            data.getFile().set("npc." + npcName + ".shop." + key + ".addPrice", 0);
+            data.saveConfig();
+            p.sendMessage(ChatColor.GREEN + "정상적으로 상점에 아이템이 추가되었습니다");
+        }else{
+            p.sendMessage(ChatColor.RED + "존재하지 않는 상점입니다. 이름을 확인해주세요");
+        }
+    }
+
+    // 모든 NPC 불러와서 생성
+    public void reloadShop(){
+        ConfigurationSection section = data.getFile().getConfigurationSection("npc");
+        for(String key: section.getKeys(false)){
+            String npcName = key;
+            Location location = data.getFile().getLocation("npc."+npcName+".location");
+            String value = data.getFile().getString("npc."+npcName+".skin.value");
+            String signature = data.getFile().getString("npc."+npcName+".skin.signature");
+            NPC.Global npc = NPCLib.getInstance().generateGlobalNPC(plugin, npcName, location);
+            npc.setSkin(value, signature);
+            npc.setFollowLookType(NPC.FollowLookType.PLAYER);
+            npc.setText(ChatColor.AQUA + npcName, ChatColor.GOLD + "상인");
+            npc.setAutoCreate(true);
+            npc.setAutoShow(true);
+            npc.update();
+            npc.forceUpdateText();
+        }
+    }
+
     // NPC 랜덤 스킨 적용
-    public NPC.Personal setNPCRandomSkin(NPC.Personal npc){
+    public NPC.Global setNPCRandomSkin(NPC.Global npc, String npcName){
         // NPC 추가 (mineskin.org)
         ArrayList<String>[] skins =  new ArrayList[7];
         for(int i = 0; i < 7; i++){
@@ -46,8 +117,11 @@ public class Shop {
         skins[6].add("ewogICJ0aW1lc3RhbXAiIDogMTY1NDU0OTY4MjE4NCwKICAicHJvZmlsZUlkIiA6ICIxNDU1MDNhNDRjZmI0NzcwYmM3NWNjMTRjYjUwMDE4NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJMaWtlbHlFcmljIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzI2NzMzMjI3YTRlMjlmNmIzZDdkZWY5NDVhZmQwZDRhN2RjNjQ4Mzc2NTU4Yzg5ZGI1OTY1YTRmZDg2ZjY1MDAiLAogICAgICAibWV0YWRhdGEiIDogewogICAgICAgICJtb2RlbCIgOiAic2xpbSIKICAgICAgfQogICAgfQogIH0KfQ==");
         skins[6].add("VvrItSrELYv4N570e2etdq+91ksqnTFKIztc+Dr/l31GP6DNTaSxTlCyfRuBzRYBy62qIb7c9JiESdMKBTMOwToEFlxTHOXjPewbDaQRiM4Z2vxXVzu42OnKJ7QYewsc2ErobtWDPXH4gbwh9CRcSabPerBVcVTNdTX7Ey+B4ADaTG5rTXpzmw5aqsPgCIHfOG2gZfsL00r++3Z5UXMHP/YnlexQHRaTdWWx+UpxrKkk4nm67NB8fI4aV3JlwP+Q/t6I7ztg50k0mHHrrjXfD1gLUGzNcK0GLfvkOIF4VKKMSzqgbUX+uTgCKdz7DRVNX5sTUTBfDp918R3MhmrfxYd6+Ydb4w0wg0dFfZ1pFHVsj7knWrwlFDE7ZGxGq1fGaSLvjUkaTjvhgisRj08aF3hOGrWTHCGC8NezvRB2hD0I1NTqxaGZSRui/3lZdVHTr0w1USPuiu/+cJP9RjZVNH3uJko/lizsx2dMWp8D9XAFWwBDlFTnZAuYlXOlcUN1Cg4CkB32HgJ+/L+YvjqA0Xf8keOJgXTQkkO5hwdYPwEIPab2C+o+eRMwFRfgzXf88dKvmpAA0yamWyoyW8e6z9b3j6opgHgtL80/lspojIlr1ujs/OSYVMJZCDtui7qMwcvXll68lUmCEDxNFpkI2Lx1i07/ejIr9cPIGgqeLHw=");
         int rand = ((int)(Math.random() * 7));
-        String value = skins[2].get(0);
-        String signature = skins[2].get(1);
+        String value = skins[rand].get(0);
+        String signature = skins[rand].get(1);
+        data.getFile().set("npc."+npcName+".skin.value", value);
+        data.getFile().set("npc."+npcName+".skin.signature", signature);
+        data.saveConfig();
         npc.setSkin(value, signature);
         return npc;
     }
