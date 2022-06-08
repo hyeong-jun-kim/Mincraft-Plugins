@@ -81,6 +81,11 @@ public class EventListener implements Listener {
             if (data.getFile().contains(name + ".revive.time")) {
                 long time = data.getFile().getLong(name + ".revive.time");
                 if (time >= System.currentTimeMillis()) { // 부활 딜레이가 안지났으면 타이틀 메시지 출력
+                    if(reviveTask.containsKey(p.getName())) { // 이미 예정된 부활 취소
+                        int id = reviveTask.get(p.getName());
+                        Bukkit.getScheduler().cancelTask(id);
+                        reviveTask.remove(p.getName());
+                    }
                     p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD+ "부활 !", "",10, 100, 20);
                     data.getFile().set(name+".revive.time", null);
                     data.saveConfig();
