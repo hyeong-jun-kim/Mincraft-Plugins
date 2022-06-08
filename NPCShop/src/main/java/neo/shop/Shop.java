@@ -6,10 +6,12 @@ import neo.data.DataManager;
 import neo.main.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -51,6 +53,27 @@ public class Shop {
         }
         if(!check)
             p.sendMessage(ChatColor.RED + "존재하지 않는 상점 이름입니다.");
+    }
+    // 상점 아이템 추가
+    public void addShopItem(String npcName, int key, int price, String itemCode, Player p){
+        if (data.getFile().contains("npc." + npcName)) {
+            ItemStack shopItem = p.getInventory().getItemInMainHand();
+            ItemStack buyItem = new ItemStack(Material.getMaterial(itemCode.toUpperCase()));
+            buyItem.setAmount(price);
+            // 추가할 수 있는 아이템 범위가 넘어갈 경우
+            if(key > 5){
+                p.sendMessage(ChatColor.RED + "5 이하의 숫자를 적어주세요!");
+                return;
+            }
+            data.getFile().set("npc." + npcName + ".shop." + key + ".shopItem", shopItem);
+            data.getFile().set("npc." + npcName + ".shop." + key + ".buyItem", buyItem);
+            data.getFile().set("npc." + npcName + ".shop." + key + ".buyCount", 1);
+            data.getFile().set("npc." + npcName + ".shop." + key + ".addPrice", 0);
+            data.saveConfig();
+            p.sendMessage(ChatColor.GREEN + "정상적으로 상점에 아이템이 추가되었습니다");
+        }else{
+            p.sendMessage(ChatColor.RED + "존재하지 않는 상점입니다. 이름을 확인해주세요");
+        }
     }
 
     // 모든 NPC 불러와서 생성
