@@ -58,11 +58,21 @@ public class Shop {
     public void addShopItem(String npcName, int key, int price, String itemCode, Player p){
         if (data.getFile().contains("npc." + npcName)) {
             ItemStack shopItem = p.getInventory().getItemInMainHand();
-            ItemStack buyItem = new ItemStack(Material.getMaterial(itemCode.toUpperCase()));
+            ItemStack buyItem;
+            try {
+                buyItem = new ItemStack(Material.getMaterial(itemCode.toUpperCase()));
+            }catch (Exception e){
+                p.sendMessage(ChatColor.RED + "올바른 아이템 코드를 입력해주세요.");
+                return;
+            }
             buyItem.setAmount(price);
             // 추가할 수 있는 아이템 범위가 넘어갈 경우
             if(key > 5){
                 p.sendMessage(ChatColor.RED + "5 이하의 숫자를 적어주세요!");
+                return;
+            }
+            if(shopItem == null || shopItem.getType() == Material.AIR || buyItem.getType() == Material.AIR){
+                p.sendMessage(ChatColor.RED + "등록할려는 물건을 확인해주세요. (혹시 빈손으로 등록하시나요?)");
                 return;
             }
             data.getFile().set("npc." + npcName + ".shop." + key + ".shopItem", shopItem);
@@ -73,6 +83,17 @@ public class Shop {
             p.sendMessage(ChatColor.GREEN + "정상적으로 상점에 아이템이 추가되었습니다");
         }else{
             p.sendMessage(ChatColor.RED + "존재하지 않는 상점입니다. 이름을 확인해주세요");
+        }
+    }
+    // 상점 오르는 가격 설정
+    public void setAddPrice(String npcName, int key, int price, Player p){
+        if(data.getFile().contains("npc." + npcName)){
+            data.getFile().set("npc." + npcName + ".shop." + key + ".buyCount", 0);
+            data.getFile().set("npc." + npcName + ".shop." + key + ".addPrice", price);
+            data.saveConfig();
+            p.sendMessage(ChatColor.GREEN + npcName +"상점의 " +key +"번째 물건의 오르는 가격이 " +price +"로 설정되었습니다.");
+        }else{
+            p.sendMessage(ChatColor.RED + "존재하지 않는 상점입니다.");
         }
     }
 

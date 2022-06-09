@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class EventListener implements Listener {
@@ -36,7 +38,6 @@ public class EventListener implements Listener {
             ConfigurationSection section = data.getFile().getConfigurationSection("npc");
             for (String key : section.getKeys(false)) {
                 if (npc.getCode().equals("npcshop.global_" + key)) {
-                    p.sendMessage("아야");
                     String npcName = npc.getCode().replace("npcshop.global_","");
                     Inventory gui = getNpcGUI(npcName, p);
                     if(gui == null)
@@ -52,6 +53,7 @@ public class EventListener implements Listener {
         String title = e.getView().getTitle();
         String shopTitle = title.substring(0, 2);
         if (shopTitle.equals("상점")) {
+
             Player p = (Player) e.getWhoClicked();
             // 공기
             ItemStack AIR = new ItemStack(Material.AIR);
@@ -67,11 +69,11 @@ public class EventListener implements Listener {
                 if (data.getFile().contains("npc." + npcName + ".shop." + key)) {
                     ItemStack shopItem = data.getFile().getItemStack("npc." + npcName + ".shop." + key + ".shopItem");
                     ItemStack buyItem = data.getFile().getItemStack("npc." + npcName + ".shop." + key + ".buyItem");
-                    int addPrice = data.getFile().getInt("npc." + npcName + ".shop." + key + ".buyItem");
+                    int addPrice = data.getFile().getInt("npc." + npcName + ".shop." + key + ".addPrice");
                     int buyCount = data.getFile().getInt("npc." + npcName + ".shop." + key + ".buyCount");
-                    addPrice = buyItem.getAmount() + buyCount * addPrice;
+                    addPrice = buyItem.getAmount() + (buyCount * addPrice);
                     if (inventory.containsAtLeast(buyItem, addPrice)) {
-                        if(inventory.firstEmpty() == -1){ // 인벤토리 꽉찼을 경우
+                        if (inventory.firstEmpty() == -1) { // 인벤토리 꽉찼을 경우
                             p.sendMessage(ChatColor.RED + "인벤토리를 한칸이상 비우고 구매해주세요!");
                             return;
                         }
@@ -79,7 +81,8 @@ public class EventListener implements Listener {
                         inventory.addItem(shopItem);
                         data.getFile().set("npc." + npcName + ".shop." + key + ".buyCount", ++buyCount);
                         data.saveConfig();
-                        p.sendMessage(ChatColor.GREEN +  "물건을 구매하셨습니다!");
+                        p.sendMessage(ChatColor.GREEN + "물건을 구매하셨습니다!");
+                        p.openInventory(getNpcGUI(npcName, p)); // 상점 새로고침
                         return;
                     } else {
                         p.sendMessage(ChatColor.RED + "물건을 사기위한 아이템의 갯수가 부족합니다!");
@@ -87,7 +90,6 @@ public class EventListener implements Listener {
                     }
                 }
             }
-
         }
     }
 
@@ -106,10 +108,18 @@ public class EventListener implements Listener {
             return null;
         }
         ItemStack[] shopItems = new ItemStack[5];
+        ItemStack[] shopDisplayItems = new ItemStack[5];
+        ItemStack[] buyItems = new ItemStack[5];
+        int[] buyCount = new int[5];
+        int[] addPrice = new int[5];
         // 아이템들 가져오기
         for(String key: section.getKeys(false)){
             int key_int = Integer.parseInt(key);
             shopItems[key_int-1] =  data.getFile().getItemStack("npc." + npcName + ".shop." + key + ".shopItem");
+            shopDisplayItems[key_int-1] =  shopItems[key_int-1].clone();
+            buyItems[key_int-1] =  data.getFile().getItemStack("npc." + npcName + ".shop." + key + ".buyItem");
+            buyCount[key_int-1] =  data.getFile().getInt("npc." + npcName + ".shop." + key + ".buyCount");
+            addPrice[key_int-1] =  data.getFile().getInt("npc." + npcName + ".shop." + key + ".addPrice");
         }
         // 기본 GUI 세팅
         Inventory gui = Bukkit.getServer().createInventory(p, 27, "상점_" + npcName);
@@ -132,7 +142,25 @@ public class EventListener implements Listener {
         for(int i = 0; i <shopItems.length; i++){
             if(shopItems[i] != null){
                 check = true;
-                gui.setItem(i+11, shopItems[i]);
+                ItemStack shopItem = shopDisplayItems[i]; // 상점에서 판매하는 아이템이랑 진열되는 아이템이랑 다름!
+                ItemStack buyItem = buyItems[i];
+                ItemMeta shopItemMeta = shopItem.getItemMeta();
+                if(shopItemMeta == null) // Material.AIR 일 때
+                    continue;
+                List<String> lore = new ArrayList<>();
+                if(shopItemMeta.getLore() != null){
+                    lore = shopItemMeta.getLore();
+                    if(lore.get(lore.size()-1).startsWith(ChatColor.AQUA + "현재 가격: ")){
+                        lore.remove(1);
+                        lore.remove(0);
+                    }
+                }
+                lore.add(ChatColor.GOLD + "구매 시 필요한 아이템: " + buyItem.getType());
+                int count = buyItem.getAmount() + (buyCount[i] * addPrice[i]);
+                lore.add(ChatColor.AQUA + "현재 가격: " + count);
+                shopItemMeta.setLore(lore);
+                shopItem.setItemMeta(shopItemMeta);
+                gui.setItem(i+11, shopDisplayItems[i]);
             }
         }
         return gui;
