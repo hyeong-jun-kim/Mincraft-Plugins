@@ -1,0 +1,129 @@
+package neo.mineral;
+
+import neo.data.DataManager;
+import neo.main.Main;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.scheduler.BukkitScheduler;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
+
+public class MineralScheduler {
+    static int[] dx = {-1,1,0,0,0,0};
+    static int[] dy = {0,0,-1,1,0,0};
+    static int[] dz = {0,0,0,0,-1,1};
+    static World world = Bukkit.getWorld("world");
+    static DataManager data = Main.getData();
+    static Main plugin = Main.getPlugin();
+
+    // 5초 뒤에 랜덤 광물 생성
+    public static void runRadomMineralTask(Location loc) {
+        Material block = getBlock();
+        BukkitScheduler scheduler = Bukkit.getScheduler();
+        scheduler.runTaskLater(plugin, () -> {
+            ArrayList<Node> blocksArray = getJoinBlocks(loc);
+            for(int i = 0; i < blocksArray.size(); i++){
+                Node node = blocksArray.get(i);
+                Location blockLoc = new Location(world, node.getA(), node.getB(), node.getC());
+                world.getBlockAt(blockLoc).setType(block);
+            }
+        }, 20L * 5L);
+    }
+    // 인접한 좌표 주소 가져오기
+    private static ArrayList<Node> getJoinBlocks(Location loc){
+        ArrayList<Node> joinBlockArray = new ArrayList<>();
+        boolean check = true;
+        int x = loc.getBlockX();
+        int y = loc.getBlockY();
+        int z = loc.getBlockZ();
+        ArrayList<Location> locArray = new ArrayList<>();
+        ConfigurationSection section = data.getFile().getConfigurationSection("mineral");
+        for(String key: section.getKeys(false)){
+            Location dataLoc = data.getFile().getLocation("mineral."+ key +".location");
+            locArray.add(dataLoc);
+        }
+        Queue<Node> q = new LinkedList<>();
+        q.offer(new Node(x, y, z));
+        loop:
+        while(!q.isEmpty()){
+            Node node = q.poll();
+            x = node.getA();
+            y = node.getB();
+            z = node.getC();
+            loop2:
+            for(int i = 0; i < 6; i++){
+                int a = x + dx[i];
+                int b = y + dy[i];
+                int c = z + dz[i];
+                if(Mineral.checkPlacedBlock(locArray, a, b, c)){
+                    // 이미 방문한 적이 있는지 체크
+                    for(int j = 0; j < joinBlockArray.size(); j++){
+                        Node BlockNode = joinBlockArray.get(i);
+                        if(a == BlockNode.getA() && b == BlockNode.getB() && c == BlockNode.getC()){
+                            continue loop2;
+                        }
+                    }
+                    Node blockNode = new Node(a,b,c);
+                    joinBlockArray.add(blockNode);
+                    q.offer(blockNode);
+                }
+            }
+        }
+        return joinBlockArray;
+    }
+
+    // 블록 확률 map에 넣기
+    private static Material getBlock() {
+        /*   <광물 확률표>
+                돌 (40)
+                석탄 (10)
+                청금석 (10)
+                레드스톤 (10)
+                철 (10)
+                금 (10)
+                다이아 (7)
+                고대잔해 (3)
+         */
+        int b[] = new int[8];
+        ConfigurationSection section = data.getFile().getConfigurationSection("blockRate");
+        int i = 0;
+        for (String block : section.getKeys(false)) {
+            int percent = data.getFile().getInt("blockRate." + block);
+            b[i++] = percent;
+        }
+        int random = (int) (Math.random() * (getSum(b, 7))) + 1;
+        Material block = Material.STONE;
+        if (1 <= random && random <= getSum(b, 0)) { // 돌
+            block = Material.STONE;
+        } else if (getSum(b, 0) <= random && random <= getSum(b, 1)) { // 석탄
+            block = Material.COAL_BLOCK;
+        } else if (getSum(b, 1) <= random && random <= getSum(b, 2)) { // 청금석
+            block = Material.LAPIS_BLOCK;
+        } else if (getSum(b, 2) <= random && random <= getSum(b, 3)) { // 레드스톤
+            block = Material.REDSTONE_BLOCK;
+        } else if (getSum(b, 3) <= random && random <= getSum(b, 4)) { // 철
+            block = Material.IRON_BLOCK;
+        } else if (getSum(b, 4) <= random && random <= getSum(b, 5)) { // 금
+            block = Material.GOLD_BLOCK;
+        } else if (getSum(b, 5) <= random && random <= getSum(b, 6)) { // 다이아
+            block = Material.DIAMOND_BLOCK;
+        } else if (getSum(b, 6) <= random && random <= getSum(b, 7)) { // 고대 잔해
+            block = Material.ANCIENT_DEBRIS;
+        }
+        return block;
+    }
+
+    private static int getSum(int b[], int idx) {
+        int sum = 0;
+        for (int i = 0; i <= idx; i++) {
+            sum += b[i];
+        }
+        return sum;
+    }
+}
