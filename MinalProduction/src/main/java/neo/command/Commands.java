@@ -19,6 +19,12 @@ public class Commands implements CommandExecutor {
             if(label.equals("광물설정")){
                 Player p = (Player)sender;
                 switch(args.length){
+                    case 1:
+                        if(args[0].equals("삭제")){
+                            Mineral mineral = new Mineral();
+                            mineral.allDeleteData(p);
+                            return true;
+                        }
                     case 3:
                         Mineral mineral = new Mineral();
                         World world = Bukkit.getWorld("world");

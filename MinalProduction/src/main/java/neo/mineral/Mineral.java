@@ -204,4 +204,10 @@ public class Mineral {
         }
         return 0;
     }
+    // data.yml 광물 초기화
+    public static void allDeleteData(Player p){
+        data.getFile().set("mineral", null);
+        data.saveConfig();
+        p.sendMessage(ChatColor.GREEN + "정상적으로 광물 설정 초기화를 완료 했습니다.");
+    }
 }
