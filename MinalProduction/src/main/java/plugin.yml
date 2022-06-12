@@ -4,6 +4,6 @@ version: 1.0
 api-version: 1.18
 author: hamtser
 commands:
-  광물:
-    usage: /광물설정
+  광물설정:
+    usage: /광물설정 x y z
     description: x,y,z 위치의 광물을 설정합니다, 사용한 위치에 광물이 없으면 5초마다 랜덤하게 광물이 나옵니다. 인접한 위치면 똑같은 광물이 나옵니다.

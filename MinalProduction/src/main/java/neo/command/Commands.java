@@ -22,11 +22,12 @@ public class Commands implements CommandExecutor {
                     case 3:
                         Mineral mineral = new Mineral();
                         World world = Bukkit.getWorld("world");
-                        int x = Integer.parseInt(args[1]);
-                        int y = Integer.parseInt(args[2]);
-                        int z = Integer.parseInt(args[3]);
+                        int x = Integer.parseInt(args[0]);
+                        int y = Integer.parseInt(args[1]);
+                        int z = Integer.parseInt(args[2]);
                         Location loc = new Location(world, x, y, z);
                         mineral.createMinal(x, y, z, p);
+                        return true;
                 }
             }
         }

@@ -23,29 +23,33 @@ public class MineralScheduler {
     static Main plugin = Main.getPlugin();
 
     // 5초 뒤에 랜덤 광물 생성
-    public static void runRadomMineralTask(Location loc) {
-        Material block = getBlock();
+    public static void runRadomMineralTask(Location loc, int key) {
+        Material mineral = getRandomBlock();
         BukkitScheduler scheduler = Bukkit.getScheduler();
         scheduler.runTaskLater(plugin, () -> {
-            ArrayList<Node> blocksArray = getJoinBlocks(loc);
+            ArrayList<Node> blocksArray = getJoinBlocks(loc, key);
             for(int i = 0; i < blocksArray.size(); i++){
                 Node node = blocksArray.get(i);
+                int k = node.getKey();
                 Location blockLoc = new Location(world, node.getA(), node.getB(), node.getC());
-                world.getBlockAt(blockLoc).setType(block);
+                world.getBlockAt(blockLoc).setType(mineral);
+                data.getFile().set("mineral." + k + ".mineral", mineral.toString());
+                data.saveConfig();
             }
         }, 20L * 5L);
     }
     // 인접한 좌표 주소 가져오기
-    private static ArrayList<Node> getJoinBlocks(Location loc){
+    private static ArrayList<Node> getJoinBlocks(Location loc, int key){
         ArrayList<Node> joinBlockArray = new ArrayList<>();
         boolean check = true;
         int x = loc.getBlockX();
         int y = loc.getBlockY();
         int z = loc.getBlockZ();
+        joinBlockArray.add(new Node(x, y, z, key));
         ArrayList<Location> locArray = new ArrayList<>();
         ConfigurationSection section = data.getFile().getConfigurationSection("mineral");
-        for(String key: section.getKeys(false)){
-            Location dataLoc = data.getFile().getLocation("mineral."+ key +".location");
+        for(String k: section.getKeys(false)){
+            Location dataLoc = data.getFile().getLocation("mineral."+ k +".location");
             locArray.add(dataLoc);
         }
         Queue<Node> q = new LinkedList<>();
@@ -61,15 +65,19 @@ public class MineralScheduler {
                 int a = x + dx[i];
                 int b = y + dy[i];
                 int c = z + dz[i];
+                // data.yml에 지정된 위치에 블록이 있는지 체크
                 if(Mineral.checkPlacedBlock(locArray, a, b, c)){
+                    int k = Mineral.getPlacedBlockKey(a, b, c); // 위치 key값 가져오기
+                    if(k == 0) continue;
                     // 이미 방문한 적이 있는지 체크
                     for(int j = 0; j < joinBlockArray.size(); j++){
-                        Node BlockNode = joinBlockArray.get(i);
+                        Node BlockNode = joinBlockArray.get(j);
                         if(a == BlockNode.getA() && b == BlockNode.getB() && c == BlockNode.getC()){
                             continue loop2;
                         }
                     }
                     Node blockNode = new Node(a,b,c);
+                    blockNode.setKey(k);
                     joinBlockArray.add(blockNode);
                     q.offer(blockNode);
                 }
@@ -79,7 +87,7 @@ public class MineralScheduler {
     }
 
     // 블록 확률 map에 넣기
-    private static Material getBlock() {
+    public static Material getRandomBlock() {
         /*   <광물 확률표>
                 돌 (40)
                 석탄 (10)

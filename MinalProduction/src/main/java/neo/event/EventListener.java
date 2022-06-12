@@ -27,16 +27,19 @@ public class EventListener implements Listener {
     @EventHandler
     public void onBlockBreakEvent(BlockBreakEvent e) {
         Location loc = e.getBlock().getLocation();
-        ConfigurationSection section = data.getFile().getConfigurationSection("mineral");
-        for (String key : section.getKeys(false)) {
-            Location dataLoc = data.getFile().getLocation("mineral." + key + ".location");
-            if (loc == dataLoc && Mineral.checkBlockAllBreak(loc)) { // 모든 블록이 다 깨졌는지 체크
-                // 인접한 광물 모두 5초뒤에 똑같은걸로 생성
-                MineralScheduler.runRadomMineralTask(loc);
+        int x = (int) loc.getX();
+        int y = (int) loc.getY();
+        int z = (int) loc.getZ();
+        if (Mineral.getPlacedBlockKey(x, y, z) != 0 && Mineral.checkBlockAllBreak(loc)) { // 모든 블록이 다 깨졌는지 체크
+            int key = Mineral.getPlacedBlockKey(x, y, z);
+            // 인접한 광물 모두 5초뒤에 똑같은걸로 생성
+            if(key != 0){
+                MineralScheduler.runRadomMineralTask(loc, key);
             }
         }
     }
-
-
-
 }
+
+
+
+
