@@ -51,7 +51,8 @@ public class DataManager {
             dataFile.set("blockRate.iron", 10);
             dataFile.set("blockRate.gold", 10);
             dataFile.set("blockRate.diamond", 7);
-            dataFile.set("blockRate.ancient", 3);
+            dataFile.set("blockRate.obsidian", 2);
+            dataFile.set("blockRate.ancient", 1);
             saveConfig();
         }
     }

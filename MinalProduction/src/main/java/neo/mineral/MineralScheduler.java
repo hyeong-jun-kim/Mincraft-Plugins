@@ -96,32 +96,35 @@ public class MineralScheduler {
                 철 (10)
                 금 (10)
                 다이아 (7)
-                고대잔해 (3)
+                옵시디언 (2)
+                고대잔해 (1)
          */
-        int b[] = new int[8];
+        int b[] = new int[9];
         ConfigurationSection section = data.getFile().getConfigurationSection("blockRate");
         int i = 0;
         for (String block : section.getKeys(false)) {
             int percent = data.getFile().getInt("blockRate." + block);
             b[i++] = percent;
         }
-        int random = (int) (Math.random() * (getSum(b, 7))) + 1;
+        int random = (int) (Math.random() * (getSum(b, 8))) + 1;
         Material block = Material.STONE;
         if (1 <= random && random <= getSum(b, 0)) { // 돌
             block = Material.STONE;
         } else if (getSum(b, 0) <= random && random <= getSum(b, 1)) { // 석탄
-            block = Material.COAL_BLOCK;
+            block = Material.DEEPSLATE_COAL_ORE;
         } else if (getSum(b, 1) <= random && random <= getSum(b, 2)) { // 청금석
-            block = Material.LAPIS_BLOCK;
+            block = Material.LAPIS_ORE;
         } else if (getSum(b, 2) <= random && random <= getSum(b, 3)) { // 레드스톤
-            block = Material.REDSTONE_BLOCK;
+            block = Material.REDSTONE_ORE;
         } else if (getSum(b, 3) <= random && random <= getSum(b, 4)) { // 철
-            block = Material.IRON_BLOCK;
+            block = Material.IRON_ORE;
         } else if (getSum(b, 4) <= random && random <= getSum(b, 5)) { // 금
-            block = Material.GOLD_BLOCK;
+            block = Material.GOLD_ORE;
         } else if (getSum(b, 5) <= random && random <= getSum(b, 6)) { // 다이아
-            block = Material.DIAMOND_BLOCK;
-        } else if (getSum(b, 6) <= random && random <= getSum(b, 7)) { // 고대 잔해
+            block = Material.DIAMOND_ORE;
+        } else if (getSum(b, 6) <= random && random <= getSum(b, 7)) { // 옵시디언
+            block = Material.OBSIDIAN;
+        } else if (getSum(b, 7) <= random && random <= getSum(b, 8)) { // 고대 잔해
             block = Material.ANCIENT_DEBRIS;
         }
         return block;
