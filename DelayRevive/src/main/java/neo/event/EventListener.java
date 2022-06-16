@@ -2,10 +2,7 @@ package neo.event;
 
 import neo.data.DataManager;
 import neo.main.Main;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -155,9 +152,14 @@ public class EventListener implements Listener {
     }
     // 리스폰 장소 불러오기
     private Location getSpawnLocation(Player p){
-        Location loc = p.getPotentialBedLocation();
+        World world = Bukkit.getWorld("world");
+        Location loc = null;
+        // "world" 월드일 때, 스폰 지점을 침대 스폰 지점으로 변경
+        if(p.getWorld().getName().equals(world.getName())){
+            loc = p.getPotentialBedLocation();
+        }
         if(loc == null)
-            loc = p.getWorld().getSpawnLocation();
+            loc = world.getSpawnLocation();
         return loc;
     }
 }
