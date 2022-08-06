@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="template-paper">
+    <output-path>$PROJECT_DIR$/out/artifacts/template_paper</output-path>
+    <root id="archive" name="template-paper.jar">
+      <element id="module-output" name="template" />
+      <element id="file-copy" path="$PROJECT_DIR$/data.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/java/plugin.yml" />
+    </root>
+  </artifact>
+</component>
