@@ -1,9 +1,9 @@
-name: name
+name: pirates
 main: neo.main.Main
 version: 1.0
-api-version: 1.18.2
+api-version: 1.16
 author: hamtser
 commands:
-  이름:
+  해적단:
     usage: /<command>
     description: 설명

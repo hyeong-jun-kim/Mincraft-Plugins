@@ -2,6 +2,7 @@ package neo.feature;
 
 import neo.data.DataManager;
 import neo.main.Main;
+import neo.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,8 +17,10 @@ public class Captain {
     static DataManager data = Main.getData();
     static FileConfiguration file = Main.getData().getFile();
     Player p;
-    Captain(Player p){
+    Util util;
+    public Captain(Player p){
         this.p = p;
+        util = new Util(p);
     }
 
     public void create(String name){
@@ -26,12 +29,12 @@ public class Captain {
             return;
         }
         // 예외 처리
-        if(!checkCaptain(name))
+        if(!util.checkCaptain(name))
             return;
         if(file.contains("pirates." + name)){
             p.sendMessage(ChatColor.RED + "이미 존재하는 해적단 이름입니다.");
         }
-        if(!checkUsernameInPirates(name))
+        if(util.checkUsernameInPirates(name))
             return;
 
         file.set("pirates." + name + ".captain", p.getName());
@@ -39,76 +42,49 @@ public class Captain {
         p.sendMessage(ChatColor.GREEN + "성공적으로 해적단이 형성되었습니다!");
     }
 
-    public void invitePlayer(Player targetPlayer){
-        String name = targetPlayer.getName();
-        String pirateName = file.getConfigurationSection("pirates").getKeys(false)
-                .stream().filter(n -> n.equals(p.getName())).findAny().orElse(null);
-        // 예외처리
-        if(!checkCaptain(name))
+    public void invitePlayer(String name){
+        if(!util.checkUserExist(name))
+            return;// 예외처리
+        if(!util.checkCaptain(p.getName()))
             return;
-        if(!checkUserExist(name))
+        if(util.checkUsernameInPirates(name))
             return;
-        if(checkUsernameInPirates(name))
-            return;
+
+        String pirateName = util.findPirateNameByCaptain(p.getName());
         if(pirateName == null)
             return;
 
+        if(Bukkit.getPlayer(name).isOnline()){
+            Bukkit.getPlayer(name).sendMessage(ChatColor.GREEN + p.getName() + "님이 " + pirateName + " 해적단에 초대하셨습니다.");
+        }
         file.set("pirates." + pirateName + ".member." + name, name);
         data.saveConfig();
-        p.sendMessage(ChatColor.GREEN + targetPlayer.getName() + "님이 해적단에 초대되셨습니다.");
+        p.sendMessage(ChatColor.GREEN + name + "님이 해적단에 초대되셨습니다.");
     }
 
-    public void kickPlayer(Player targetPlayer){
-        String name = targetPlayer.getName();
-        String pirateName = file.getConfigurationSection("pirates").getKeys(false)
-                .stream().filter(n -> n.equals(p.getName())).findAny().orElse(null);
-        // 예외처리
-        if(!checkUserExist(name))
+    public void kickPlayer(String targetName){
+        if(file.get("pirates") == null)
             return;
+        if(!util.checkUserExist(targetName))
+            return;
+
+        String pirateName = file.getConfigurationSection("pirates").getKeys(false)
+                .stream().filter(k -> file.contains("pirates." + k + ".member." + targetName))
+                .findAny().orElse(null);
         if(pirateName == null)
             return;
-        if(!file.contains("pirates." + pirateName + ".member." + name)){
+
+        if(!file.contains("pirates." + pirateName + ".member." + targetName)){
             p.sendMessage(ChatColor.RED + "위 플레이어는 " + pirateName + "해적단에 속해있지 않습니다.");
             return;
         }
 
-        file.set("pirates." + pirateName + ".member." + name, null);
+        if(Bukkit.getPlayer(targetName).isOnline()){
+            Bukkit.getPlayer(targetName).sendMessage(ChatColor.RED + p.getName() + "님이 " + pirateName + " 해적단에 추방 당하셨습니다.");
+        }
+
+        file.set("pirates." + pirateName + ".member." + targetName, null);
         data.saveConfig();
-        p.sendMessage(ChatColor.GREEN + "성공적으로 " +name +"을 해적단에서 제거했습니다.");
-    }
-
-    public void declareWar(String pirateName){
-
-    }
-
-    public boolean checkUserExist(String name){
-        long count = Arrays.stream(Bukkit.getOfflinePlayers()).filter(
-                n -> n.equals(name)
-        ).count();
-        if(count == 0){
-            p.sendMessage(ChatColor.RED + "존재하지 않는 플레이어입니다.");
-            return false;
-        }
-        return true;
-    }
-
-    public boolean checkUsernameInPirates(String name){
-        // 해적단에 속해있는지 확인
-        long count = file.getConfigurationSection("pirates").getKeys(true).stream().filter(
-                n -> n.equals(name)).count();
-        if(count > 0){
-            p.sendMessage(ChatColor.YELLOW + "해당 작업을 수행하실려면 현재 해적단을 탈퇴하신 뒤에 다시 수행해주세요");
-            return true;
-        }
-        return false;
-    }
-
-    public boolean checkCaptain(String name){
-        if(file.getConfigurationSection("area").contains(name)){
-            p.sendMessage(ChatColor.RED + "위 명령어는 선장만 가능한 명령어입니다.");
-            return true;
-        }else{
-            return false;
-        }
+        p.sendMessage(ChatColor.GREEN + "성공적으로 " +targetName +"을 해적단에서 제거했습니다.");
     }
 }

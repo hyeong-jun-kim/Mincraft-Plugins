@@ -106,6 +106,7 @@ public class MineralScheduler {
             int percent = data.getFile().getInt("blockRate." + block);
             b[i++] = percent;
         }
+        int sum = getSum(b, 8);
         int random = (int) (Math.random() * (getSum(b, 8))) + 1;
         Material block = Material.STONE;
         if (1 <= random && random <= getSum(b, 0)) { // 돌
