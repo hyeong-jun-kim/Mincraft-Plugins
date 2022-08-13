@@ -63,10 +63,14 @@ public class AreaEventHandler {
             if (captainName == null)
                 return false;
 
+            // 자기 해적단의 신호기는 못깸
+            if (material == Material.BEACON) {
+                if(areaName.equals(captainName))
+                    return false;
+
             // 전쟁 중 확인
             String targetPirateName = EventUtil.getWarTargetPirateName(p, captainName, areaName);
             if (targetPirateName != null){
-                if (material == Material.BEACON) {
                     // 상대방 영토 파괴
                     String myPirateName = EventUtil.findPirateName(p.getName());
                     EventUtil.destoryPirate(myPirateName, targetPirateName, areaName, p);

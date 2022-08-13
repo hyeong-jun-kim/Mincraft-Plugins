@@ -67,9 +67,9 @@ public class Captain {
             targetPlayer.sendMessage(ChatColor.GREEN + p.getName() + "님이 " + pirateName + " 해적단에 초대하셨습니다.");
             targetPlayer.playerListName(Component.text("[" + pirateName + "해적단]" + p.getName()));
         }
-        file.set("pirates." + pirateName + ".member." + name, name);
+        file.set("pirates." + pirateName + ".member." + targetPlayer, targetPlayer);
         data.saveConfig();
-        p.sendMessage(ChatColor.GREEN + name + "님이 해적단에 초대되셨습니다.");
+        p.sendMessage(ChatColor.GREEN + targetPlayer.getName() + "님이 해적단에 초대되셨습니다.");
     }
 
     public void kickPlayer(String targetName){

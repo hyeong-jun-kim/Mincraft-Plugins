@@ -20,8 +20,8 @@ public class War {
     private static Main plugin = (Main) JavaPlugin.getProvidingPlugin(Main.class);
 
     // TODO 시간 수정해야 함
-    final static int READY_TIME = 5 * 60; // 5분
-    final static int WAR_TIME = 25 * 60; // 25분
+    final static int READY_TIME = 5 * 1; // 5분
+    final static int WAR_TIME = 25 * 1; // 25분
 
     static DataManager data = Main.getData();
     static FileConfiguration file = Main.getData().getFile();
