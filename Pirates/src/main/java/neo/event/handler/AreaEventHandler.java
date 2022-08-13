@@ -4,33 +4,43 @@ import neo.data.AreaData;
 import neo.data.DataManager;
 import neo.feature.Area;
 import neo.main.Main;
+import neo.util.EventUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockPlaceEvent;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class AreaEventHandler {
     static DataManager data = Main.getData();
     static FileConfiguration file = Main.getData().getFile();
-    static HashMap<String, AreaData> areaMap = Main.getAreaMap();
-    public static void createArea(Player p){
-        Area.createArea(p);
+    public static void createArea(Player p, BlockPlaceEvent e) {
+        Area.createArea(p, e);
     }
 
-    public static boolean checkStepIntoArea(Player p){
+    public static boolean checkStepIntoArea(Player p) {
         Location loc = p.getLocation();
-        Map.Entry<String, AreaData> data = getAreaData(loc);
-        if(data == null){
+        Map.Entry<String, AreaData> data = EventUtil.getAreaData(loc);
+        if (data == null) {
             return true;
-        }else{
+        } else {
             String areaName = data.getKey();
-            String pirateName = findPirateCaptainName(p.getName());
-            if(areaName.equals(pirateName)){
+            String captainName = EventUtil.findPirateCaptainName(p.getName());
+
+            // 전쟁 중 확인
+            if (EventUtil.getWarTargetPirateName(p, captainName, areaName) != null)
                 return true;
-            }else{
+
+            if (areaName.equals(captainName)) {
+                return true;
+            } else {
+                // 영토 선언하고 해적단은 안만들었을 경우
+                if(data.getKey().equals(p.getName()))
+                    return true;
+
                 AreaData areaData = data.getValue();
                 double x = areaData.x1 - 2;
                 double y = loc.getY();
@@ -43,43 +53,36 @@ public class AreaEventHandler {
         }
     }
 
-    public static boolean checkPlaceorBreakIntoArea(Player p, Location loc){
-        Map.Entry<String, AreaData> data = getAreaData(loc);
-        if(data == null){
+    public static boolean checkPlaceorBreakIntoArea(Player p, Location loc, Material material) {
+        Map.Entry<String, AreaData> data = EventUtil.getAreaData(loc);
+        if (data == null) {
             return true;
-        }else{
+        } else {
             String areaName = data.getKey();
-            String pirateName = findPirateCaptainName(p.getName());
-            if(pirateName == null)
+            String captainName = EventUtil.findPirateCaptainName(p.getName());
+            if (captainName == null)
                 return false;
 
-            if(areaName.equals(pirateName)){
+            // 전쟁 중 확인
+            String targetPirateName = EventUtil.getWarTargetPirateName(p, captainName, areaName);
+            if (targetPirateName != null){
+                if (material == Material.BEACON) {
+                    // 상대방 영토 파괴
+                    String myPirateName = EventUtil.findPirateName(p.getName());
+                    EventUtil.destoryPirate(myPirateName, targetPirateName, areaName, p);
+                    return true;
+                }
                 return true;
-            }else{
+            }
+
+            if (areaName.equals(captainName)) {
+                return true;
+            } else {
                 return false;
             }
         }
+
     }
 
-    public static Map.Entry<String, AreaData> getAreaData(Location loc){
-        int x = loc.getBlockX();
-        int z = loc.getBlockZ();
-        Map.Entry<String, AreaData> data = areaMap.entrySet().stream().filter(
-                map -> ((map.getValue().x1 <= x && map.getValue().x2 >= x)
-                        && (map.getValue().z1 <= z && map.getValue().z2 >= z))
-        ).findAny().orElse(null);
-        return data;
-    }
 
-    public static String findPirateCaptainName(String name){
-        String pirateName = file.getConfigurationSection("pirates").getKeys(false)
-                .stream().filter(
-                        key -> file.contains("pirates." + key + ".member." + name)
-                ).findAny().orElse(null);
-        if(pirateName == null)
-            return null;
-
-        String captainName = file.getString("pirates." + pirateName + ".captain");
-        return captainName;
-    }
 }

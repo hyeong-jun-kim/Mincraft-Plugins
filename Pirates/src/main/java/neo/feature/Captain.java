@@ -2,7 +2,9 @@ package neo.feature;
 
 import neo.data.DataManager;
 import neo.main.Main;
+import neo.util.Regex;
 import neo.util.Util;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -23,22 +25,28 @@ public class Captain {
         util = new Util(p);
     }
 
-    public void create(String name){
-        if(name.length() > 7){
+    public void create(String pirateName){
+        // 예외 처리
+        if(pirateName.length() > 7){
             p.sendMessage(ChatColor.RED + "최대 7글자까지 설정이 가능합니다.");
             return;
-        }
-        // 예외 처리
-        if(!util.checkCaptain(name))
+        }else if(!Regex.checkHangulOrEnglish(pirateName)){
+            p.sendMessage(ChatColor.RED + "이름은 한글 또는 영문만 입력 가능합니다.");
             return;
-        if(file.contains("pirates." + name)){
-            p.sendMessage(ChatColor.RED + "이미 존재하는 해적단 이름입니다.");
         }
-        if(util.checkUsernameInPirates(name))
+        if(!util.checkCaptain(p.getName())){
+            return;
+        }
+        if(file.contains("pirates." + pirateName)){
+            p.sendMessage(ChatColor.RED + "이미 존재하는 해적단 이름입니다.");
+            return;
+        }
+        if(util.checkUsernameInPirates(pirateName))
             return;
 
-        file.set("pirates." + name + ".captain", p.getName());
+        file.set("pirates." + pirateName + ".captain", p.getName());
         data.saveConfig();
+        p.playerListName(Component.text("[" + pirateName + "해적단]" + p.getName()));
         p.sendMessage(ChatColor.GREEN + "성공적으로 해적단이 형성되었습니다!");
     }
 
@@ -54,8 +62,10 @@ public class Captain {
         if(pirateName == null)
             return;
 
-        if(Bukkit.getPlayer(name).isOnline()){
-            Bukkit.getPlayer(name).sendMessage(ChatColor.GREEN + p.getName() + "님이 " + pirateName + " 해적단에 초대하셨습니다.");
+        Player targetPlayer = Bukkit.getPlayer(name);
+        if(targetPlayer.isOnline()){
+            targetPlayer.sendMessage(ChatColor.GREEN + p.getName() + "님이 " + pirateName + " 해적단에 초대하셨습니다.");
+            targetPlayer.playerListName(Component.text("[" + pirateName + "해적단]" + p.getName()));
         }
         file.set("pirates." + pirateName + ".member." + name, name);
         data.saveConfig();
@@ -81,6 +91,8 @@ public class Captain {
 
         if(Bukkit.getPlayer(targetName).isOnline()){
             Bukkit.getPlayer(targetName).sendMessage(ChatColor.RED + p.getName() + "님이 " + pirateName + " 해적단에 추방 당하셨습니다.");
+            Main.cM.joinChannel(p, "General");
+            p.playerListName(Component.text(p.getName()));
         }
 
         file.set("pirates." + pirateName + ".member." + targetName, null);

@@ -23,6 +23,8 @@ public class ChattingHandler {
 
     public static boolean checkCaptain(Player p){
         String name = p.getName();
+        if(file.get("area") == null)
+            return false;
         if(file.getConfigurationSection("area").getKeys(false).contains(name)){
             return true;
         }else{

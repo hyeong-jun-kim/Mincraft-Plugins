@@ -63,10 +63,12 @@ public class Util {
         return false;
     }
 
-    // 선장인지 호가인
+    // 선장인지 확인
     public boolean checkCaptain(String name){
-        if(file.get("area") == null)
+        if(file.get("area") == null){
+            p.sendMessage(ChatColor.RED + "영토를 생성하신 뒤에 위 명령어를 실행해주세요.");
             return false;
+        }
         if(file.getConfigurationSection("area").getKeys(false).stream()
                 .filter(key -> key.equals(name)).findAny().orElse(null) == null){
             p.sendMessage(ChatColor.RED + "위 명령어는 선장만 가능한 명령어입니다.");
@@ -78,6 +80,9 @@ public class Util {
 
     // 선장 이름으로 해적단 찾기
     public String findPirateNameByCaptain(String name){
+        if(file.get("pirates") == null)
+            return null;
+
         String pirateName = file.getConfigurationSection("pirates").getKeys(false)
                 .stream().filter(k ->
                         file.getString("pirates." + k + ".captain")

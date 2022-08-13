@@ -6,4 +6,7 @@ author: hamtser
 commands:
   해적단:
     usage: /<command>
-    description: 설명
+    description: 해적단 관련 커맨드
+  전쟁선포:
+    usage: /<command>
+    description: 전쟁을 선포합니다

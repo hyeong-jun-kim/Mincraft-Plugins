@@ -13,6 +13,8 @@ public class SailorEventHandler {
     public static String getPirateName(Player p){
         String pirateName = null;
         String name = p.getName();
+        if(file.get("pirates") == null)
+            return null;
         pirateName = file.getConfigurationSection("pirates").getKeys(false).stream().filter(
                 key -> file.contains("pirates." + key + ".member." + name)).findAny().orElse(null);
         return pirateName;

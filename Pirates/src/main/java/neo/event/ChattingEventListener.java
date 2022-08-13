@@ -27,7 +27,6 @@ public class ChattingEventListener implements Listener {
         Player p = e.getPlayer();
 
         // 일반 채널 해쉬 값 넣어주기
-        ArrayList<Player> players = new ArrayList<Player>();
         main.cM.joinChannel(p, "General");
 
         String pirateName = ChattingHandler.getPirateName(p);
@@ -71,6 +70,10 @@ public class ChattingEventListener implements Listener {
     public void onPlayerChannelChat(AsyncChatEvent e){
         Player p = e.getPlayer();
         e.recipients().clear();
+        // 리로드했을 경우 오류 처리
+        if(main.cM.getChannel(p) == null)
+            main.cM.joinChannel(p, "General");
+
         main.cM.getChannel(p).stream().forEach(
                 player -> e.recipients().add(player)
         );
