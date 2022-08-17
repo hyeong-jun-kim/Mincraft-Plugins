@@ -5,9 +5,11 @@ import neo.data.DataManager;
 import neo.feature.Area;
 import neo.main.Main;
 import neo.util.EventUtil;
+import neo.util.Util;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -17,11 +19,15 @@ import java.util.Map;
 public class AreaEventHandler {
     static DataManager data = Main.getData();
     static FileConfiguration file = Main.getData().getFile();
+    static Util util;
     public static void createArea(Player p, BlockPlaceEvent e) {
         Area.createArea(p, e);
     }
 
     public static boolean checkStepIntoArea(Player p) {
+        if(p.isOp())
+            return true;
+
         Location loc = p.getLocation();
         Map.Entry<String, AreaData> data = EventUtil.getAreaData(loc);
         if (data == null) {
@@ -85,8 +91,30 @@ public class AreaEventHandler {
                 return false;
             }
         }
-
     }
 
+    public static void teleportMyPirateArea(Player p){
+        String name = p.getName();
+        util = new Util(p);
+        String pirateName = util.findPirateName(name);
+        if(pirateName == null)
+            return;
 
+        String captainName = util.getCaptainName(pirateName);
+        if(captainName == null)
+            return;
+
+        if(file.get("area." + captainName) == null)
+            return;
+
+        int x = file.getInt("area." + captainName + ".x1") + 35;
+        int y = file.getInt("area." + captainName + ".y") + 1;
+        int z = file.getInt("area." + captainName + ".z1") + 35;
+
+        World world = p.getWorld();
+        Location loc = new Location(world, x, y, z);
+
+        p.teleport(loc);
+        return;
+    }
 }

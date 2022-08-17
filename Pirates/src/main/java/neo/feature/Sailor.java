@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Set;
 
 // 일반 명령어
@@ -21,6 +22,7 @@ public class Sailor {
     Util util;
     static DataManager data = Main.getData();
     static FileConfiguration file = Main.getData().getFile();
+    static HashMap<String, String> inviteMap = Main.inviteMap;
     Player p;
 
     public Sailor(Main main, Player p) {
@@ -93,5 +95,40 @@ public class Sailor {
         main.cM.joinChannel(p, pirateName);
     }
 
+    public void acceptInvite(){
+        String name = p.getName();
+        if(inviteMap.containsKey(name)){
+            String pirateName = inviteMap.get(name);
+            if(!file.contains("pirates." + pirateName)){
+                p.sendMessage(ChatColor.RED + "존재하지 않는 해적단입니다.");
+                inviteMap.remove(name);
+                return;
+            }
+            p.sendMessage(ChatColor.GREEN + pirateName +"해적단 초대 수락 요청이 처리되었습니다.");
+            p.playerListName(Component.text("[" + pirateName + "해적단]" + p.getName()));
 
+            file.set("pirates." + pirateName + ".member." + name, name);
+            data.saveConfig();
+            inviteMap.remove(name);
+
+        }else{
+            p.sendMessage(ChatColor.RED + "해적단 초대가 와야 위 명령어를 사용하실 수 있습니다.");
+        }
+    }
+
+    public void rejectInvite(){
+        String name = p.getName();
+        if(inviteMap.containsKey(name)){
+            String pirateName = inviteMap.get(name);
+            if(!file.contains("pirates." + pirateName)){
+                p.sendMessage(ChatColor.RED + "존재하지 않는 해적단입니다.");
+                inviteMap.remove(name);
+                return;
+            }
+            p.sendMessage(ChatColor.GREEN + pirateName +"해적단 초대 수락 요청을 거절하였습니다.");
+            inviteMap.remove(name);
+        }else{
+            p.sendMessage(ChatColor.RED + "해적단 초대가 와야 위 명령어를 사용하실 수 있습니다.");
+        }
+    }
 }

@@ -11,6 +11,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ import java.util.Set;
 public class Captain {
     static DataManager data = Main.getData();
     static FileConfiguration file = Main.getData().getFile();
+    static HashMap<String, String> inviteMap = Main.inviteMap;
     Player p;
     Util util;
     public Captain(Player p){
@@ -30,11 +32,7 @@ public class Captain {
         if(pirateName.length() > 7){
             p.sendMessage(ChatColor.RED + "최대 7글자까지 설정이 가능합니다.");
             return;
-        }else if(!Regex.checkHangulOrEnglish(pirateName)){
-            p.sendMessage(ChatColor.RED + "이름은 한글 또는 영문만 입력 가능합니다.");
-            return;
-        }
-        if(!util.checkCaptain(p.getName())){
+        }if(!util.checkCaptain(p.getName())){
             return;
         }
         if(file.contains("pirates." + pirateName)){
@@ -43,10 +41,8 @@ public class Captain {
         }
         if(util.checkUsernameInPirates(pirateName))
             return;
-
         file.set("pirates." + pirateName + ".captain", p.getName());
         data.saveConfig();
-        p.playerListName(Component.text("[" + pirateName + "해적단]" + p.getName()));
         p.sendMessage(ChatColor.GREEN + "성공적으로 해적단이 형성되었습니다!");
     }
 
@@ -64,12 +60,12 @@ public class Captain {
 
         Player targetPlayer = Bukkit.getPlayer(name);
         if(targetPlayer.isOnline()){
-            targetPlayer.sendMessage(ChatColor.GREEN + p.getName() + "님이 " + pirateName + " 해적단에 초대하셨습니다.");
-            targetPlayer.playerListName(Component.text("[" + pirateName + "해적단]" + p.getName()));
+            targetPlayer.sendMessage(ChatColor.GREEN + p.getName() + "님이 " + pirateName + " 해적단에 초대하셨습니다. "
+                    + ChatColor.YELLOW + "수락하실려면 /해적단 수락 명령어를 입력해주세요.");
+            inviteMap.put(name, pirateName);
         }
-        file.set("pirates." + pirateName + ".member." + targetPlayer, targetPlayer);
-        data.saveConfig();
-        p.sendMessage(ChatColor.GREEN + targetPlayer.getName() + "님이 해적단에 초대되셨습니다.");
+
+        p.sendMessage(ChatColor.GREEN + targetPlayer.getName() + "님한테 해적단 초대 요청을 전송하였습니다.");
     }
 
     public void kickPlayer(String targetName){

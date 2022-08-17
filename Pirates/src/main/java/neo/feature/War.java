@@ -3,13 +3,19 @@ package neo.feature;
 import neo.data.AreaData;
 import neo.data.DataManager;
 import neo.main.Main;
+import neo.util.EventUtil;
 import neo.util.Util;
 import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
@@ -18,16 +24,17 @@ import java.util.Set;
 
 public class War {
     private static Main plugin = (Main) JavaPlugin.getProvidingPlugin(Main.class);
+    private BukkitTask readyTask = null;
+    private BukkitTask warTask = null;
 
     // TODO 시간 수정해야 함
     final static int READY_TIME = 5 * 1; // 5분
-    final static int WAR_TIME = 25 * 1; // 25분
+    final static int WAR_TIME = 10 * 1; // 25분
 
     static DataManager data = Main.getData();
     static FileConfiguration file = Main.getData().getFile();
     public static HashMap<String, AreaData> areaMap = Main.getAreaMap();
     public static HashMap<String, String> warMap = Main.getWarMap();
-    public static HashMap<String, BukkitTask> warTaskMap = Main.getWarTaskMap();
 
     Player p;
     Util util;
@@ -39,26 +46,26 @@ public class War {
         util = new Util(p);
     }
 
-    public void declare(String targetPirateName) {
+    public void declare(String captainName) {
+        String targetPirateName = util.findPirateNameByCaptain(captainName);
+        if (targetPirateName == null)
+            return;
         if (!util.checkCaptain(p.getName()))
             return;
-        if (!checkPirateName(targetPirateName))
+        if (!checkPirateCreatedByAreaName(p.getName()))
             return;
-        if(!checkPirateCreatedByAreaName(p.getName()))
-            return;
-        String targetCaptainName = util.getCaptainName(targetPirateName);
-        if (!checkPiratePlayerNum(targetCaptainName))
+        if (!checkPiratePlayerNum(captainName))
             return;
 
         String myPirateName = util.findPirateNameByCaptain(p.getName());
-        if(myPirateName.equals(targetPirateName)){
+        if (myPirateName.equals(targetPirateName)) {
             p.sendMessage(ChatColor.RED + "자기 자신의 해적단한테는 전쟁 선포를 못합니다");
             return;
         }
 
         if (warMap.containsKey(myPirateName)) {
             p.sendMessage(ChatColor.RED + "전쟁은 하나의 해적단만 선포가 가능합니다.");
-        } else if (warMap.containsKey(targetCaptainName)) {
+        } else if (warMap.containsKey(captainName)) {
             p.sendMessage(ChatColor.RED + "해당 해적단은 현재 전쟁중이므로 선포가 불가능합니다.");
         }
         startWar(myPirateName, targetPirateName);
@@ -67,23 +74,23 @@ public class War {
     private boolean checkPirateName(String name) {
         if (file.get("pirates") == null)
             return false;
-        if(file.contains("pirates." + name)){
+        if (file.contains("pirates." + name)) {
             return true;
-        }else{
+        } else {
             p.sendMessage(ChatColor.RED + "존재하지 않는 해적단 이름입니다.");
             return false;
         }
     }
 
     // 영토 생성 후 해적단을 생성했는지 확인하는 메서드
-    private boolean checkPirateCreatedByAreaName(String areaName){
+    private boolean checkPirateCreatedByAreaName(String areaName) {
         long count = file.getConfigurationSection("pirates").getKeys(false)
                 .stream().filter(key -> file.getString("pirates." + key + ".captain").equals(areaName))
                 .count();
-        if(count == 0){
+        if (count == 0) {
             p.sendMessage(ChatColor.RED + "해적단을 생성하신 뒤에 위 명령어를 입력해 주세요");
             return false;
-        }else{
+        } else {
             return true;
         }
     }
@@ -101,7 +108,7 @@ public class War {
                             && (z1 <= p.getLocation().getZ() && z2 >= p.getLocation().getZ()))
                     .count();
             // TODO count 숫자 4로 수정하기
-            if (count >= 4) {
+            if (count >= 1) {
                 return true;
             } else {
                 p.sendMessage(ChatColor.RED + "상대방의 영토에 4명이상의 플레이어가 접속해있지 않아서, 전쟁 선포가 불가능합니다.");
@@ -118,27 +125,58 @@ public class War {
                 " 5분뒤에 전쟁이 시작됩니다.");
         sendMessagePiratePlayer(targetPirateName, ChatColor.GREEN + targetPirateName + ChatColor.GREEN + "이 전쟁을 선포하였습니다." +
                 " 5분뒤에 전쟁이 시작됩니다.");
+        BossBar bossBar = Bukkit.createBossBar("전쟁 준비", BarColor.YELLOW, BarStyle.SEGMENTED_10);
 
-        Bukkit.getScheduler().runTaskLater(main, () -> {
-            sendMessagePiratePlayer(myPirateaName, ChatColor.GREEN + targetPirateName + ChatColor.GREEN + "와 전쟁이 시작되었습니다!");
-            sendMessagePiratePlayer(targetPirateName, ChatColor.GREEN + targetPirateName + ChatColor.GREEN + "와 전쟁이 시작되었습니다!");
+        // 전쟁 준비 타이머
+        if (readyTask == null) {
+            readyTask = new BukkitRunnable() {
+                int readyTime = READY_TIME;
 
-            warMap.put(myPirateaName, targetPirateName);
-            warMap.put(targetPirateName, myPirateaName);
+                @Override
+                public void run() {
+                    if (readyTime == READY_TIME) {
+                        warMap.put(myPirateaName, targetPirateName);
+                        warMap.put(targetPirateName, myPirateaName);
+                    }
+                    if ((readyTime -= 1) == 0) {
+                        this.cancel();
 
-            BukkitTask bukkitTask = Bukkit.getScheduler().runTaskLater(main, () -> {
-                warMap.remove(myPirateaName);
-                warMap.remove(targetPirateName);
-                sendMessagePiratePlayer(myPirateaName, ChatColor.GREEN + targetPirateName + ChatColor.GREEN + "와 전쟁이 종료되었습니다.");
-                sendMessagePiratePlayer(targetPirateName, ChatColor.GREEN + myPirateaName + ChatColor.GREEN + "와 전쟁이 종료되었습니다.");
+                        // 전쟁 시작 타이머
+                        if(warTask ==  null) {
+                            warTask = new BukkitRunnable() {
+                                int warTime = WAR_TIME;
 
-                warTaskMap.remove(myPirateaName);
-                warTaskMap.remove(targetPirateName);
-                }, WAR_TIME * 20);
+                                @Override
+                                public void run() {
+                                    if (warTime == WAR_TIME) {
+                                        bossBar.setColor(BarColor.GREEN);
+                                        bossBar.setTitle("전쟁 시작");
+                                        sendMessagePiratePlayer(myPirateaName, ChatColor.YELLOW + targetPirateName + "와의 전쟁이 시작되었습니다!");
+                                        sendMessagePiratePlayer(targetPirateName, ChatColor.YELLOW + myPirateaName + "와의 전쟁이 시작되었습니다!");
+                                    }
+                                    if ((warTime -= 1) == 0 ||
+                                            (!warMap.containsKey(myPirateaName) && !warMap.containsKey(targetPirateName))) {
+                                        this.cancel();
+                                        warMap.remove(myPirateaName);
+                                        warMap.remove(targetPirateName);
+                                        bossBar.removeAll();
+                                    } else {
+                                        bossBar.setProgress(warTime / (double) WAR_TIME);
+                                    }
+                                }
+                            }.runTaskTimer(main, 0, 20);
+                        }
 
-            warTaskMap.put(myPirateaName, bukkitTask);
-            warTaskMap.put(targetPirateName, bukkitTask);
-        }, READY_TIME * 20);
+                    } else {
+                        bossBar.setProgress(readyTime / (double) READY_TIME);
+                    }
+                }
+            }.runTaskTimer(main, 0, 20);
+
+            bossBar.setVisible(true);
+            EventUtil.addBossBar(bossBar, myPirateaName);
+            EventUtil.addBossBar(bossBar, targetPirateName);
+        }
     }
 
     // 해적단 선원들 가져오기

@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.server.ServerLoadEvent;
@@ -87,6 +89,17 @@ public class EventListener implements Listener {
             Player hitPlayer = (Player) e.getDamager();
             if (!EventUtil.checkHitPlayer(p, hitPlayer))
                 e.setCancelled(true);
+        }
+    }
+
+    // NPC 클릭시 영토 이동 이벤트
+    @EventHandler
+    public void onWarpNpcClickEvent(PlayerInteractEntityEvent e){
+        Entity entity = e.getRightClicked();
+        Player p = e.getPlayer();
+        String npcName = "[ [W] &a영토 워프 ]";
+        if(entity.getCustomName().equals(npcName)){
+            AreaEventHandler.teleportMyPirateArea(p);
         }
     }
 }

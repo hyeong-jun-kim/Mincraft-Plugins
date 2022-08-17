@@ -42,6 +42,10 @@ public class Commands implements CommandExecutor {
                             sailor.printCaptainAndPirateName();
                         }else if(args[0].equals("채팅")){
                             sailor.joinChatChannels(p);
+                        }else if(args[0].equals("수락")){
+                            sailor.acceptInvite();
+                        }else if(args[0].equals("거절")){
+                            sailor.rejectInvite();
                         }
                         break;
                     case 2:

@@ -17,7 +17,7 @@ public class Main extends JavaPlugin {
     public static DataManager data;
     public static HashMap<String, AreaData> areaMap;
     public static HashMap<String, String> warMap;
-    public static HashMap<String, BukkitTask> warTaskMap; // 전쟁시 스케쥴러 맵
+    public static HashMap<String, String> inviteMap; // 해적단 초대받은 플레이어 저장
 
     public static ChannelManager cM;
     @Override
@@ -25,7 +25,7 @@ public class Main extends JavaPlugin {
         data = new DataManager(this);
         areaMap = new HashMap<>();
         warMap = new HashMap<>();
-        warTaskMap = new HashMap<>();
+        inviteMap = new HashMap<>();
         cM = new ChannelManager();
         getServer().getPluginManager().registerEvents(new EventListener(), this);
         getServer().getPluginManager().registerEvents(new ChattingEventListener(this), this);
@@ -47,9 +47,6 @@ public class Main extends JavaPlugin {
 
     public static HashMap<String, String> getWarMap(){
         return warMap;
-    }
-    public static HashMap<String, BukkitTask> getWarTaskMap(){
-        return warTaskMap;
     }
 }
 
