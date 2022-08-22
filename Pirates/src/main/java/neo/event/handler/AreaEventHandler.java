@@ -58,7 +58,7 @@ public class AreaEventHandler {
                 double z = areaData.z1 - 2;
                 loc.set(x, y, z);
                 p.teleport(loc);
-                p.sendMessage(ChatColor.RED + captainName + "님의 영토입니다. 전쟁중이 아니시면 입장하실 수 없습니다.");
+                p.sendMessage(ChatColor.RED + areaName + "님의 영토입니다. 전쟁중이 아니시면 입장하실 수 없습니다.");
                 return false;
             }
         }
