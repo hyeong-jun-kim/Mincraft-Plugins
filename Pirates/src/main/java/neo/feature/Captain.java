@@ -2,6 +2,7 @@ package neo.feature;
 
 import neo.data.DataManager;
 import neo.main.Main;
+import neo.util.EventUtil;
 import neo.util.Regex;
 import neo.util.Util;
 import net.kyori.adventure.text.Component;
@@ -43,6 +44,7 @@ public class Captain {
             return;
         file.set("pirates." + pirateName + ".captain", p.getName());
         data.saveConfig();
+        p.playerListName(Component.text("[" + EventUtil.getColoredPirateName(pirateName) + "해적단]" + p.getName()));
         p.sendMessage(ChatColor.GREEN + "성공적으로 해적단이 형성되었습니다!");
     }
 
@@ -60,7 +62,7 @@ public class Captain {
 
         Player targetPlayer = Bukkit.getPlayer(name);
         if(targetPlayer.isOnline()){
-            targetPlayer.sendMessage(ChatColor.GREEN + p.getName() + "님이 " + pirateName + " 해적단에 초대하셨습니다. "
+            targetPlayer.sendMessage(ChatColor.GREEN + p.getName() + "님이 " + EventUtil.getColoredPirateName(pirateName) + ChatColor.GREEN + " 해적단에 초대하셨습니다. "
                     + ChatColor.YELLOW + "수락하실려면 /해적단 수락 명령어를 입력해주세요.");
             inviteMap.put(name, pirateName);
         }

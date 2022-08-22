@@ -84,7 +84,7 @@ public class EventListener implements Listener {
     // 같은 해적단끼리 PVP 불가능
     @EventHandler
     public void onInteractEvent(EntityDamageByEntityEvent e) {
-        if (e.getDamager().getType() == EntityType.PLAYER) {
+        if (e.getDamager().getType() == EntityType.PLAYER && e.getEntity().getType() == EntityType.PLAYER) {
             Player p = (Player) e.getEntity();
             Player hitPlayer = (Player) e.getDamager();
             if (!EventUtil.checkHitPlayer(p, hitPlayer))

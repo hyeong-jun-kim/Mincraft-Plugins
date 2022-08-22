@@ -27,7 +27,7 @@ public class Area {
         }
 
         World world = p.getWorld();
-        if(world.getName().equals("world")){ // TODO 이부분 나중에 island로 변경
+        if(world.getName().equals("island")){ // TODO 이부분 나중에 island로 변경
             Location loc = e.getBlock().getLocation();
             // 겹치는 구역 없는지 확인
             if(!EventUtil.checkCreateArea(loc, p)){

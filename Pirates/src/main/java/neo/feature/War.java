@@ -28,8 +28,8 @@ public class War {
     private BukkitTask warTask = null;
 
     // TODO 시간 수정해야 함
-    final static int READY_TIME = 5 * 1; // 5분
-    final static int WAR_TIME = 10 * 1; // 25분
+    final static int READY_TIME = 5 * 60; // 5분
+    final static int WAR_TIME = 25 * 60; // 25분
 
     static DataManager data = Main.getData();
     static FileConfiguration file = Main.getData().getFile();
@@ -108,7 +108,7 @@ public class War {
                             && (z1 <= p.getLocation().getZ() && z2 >= p.getLocation().getZ()))
                     .count();
             // TODO count 숫자 4로 수정하기
-            if (count >= 1) {
+            if (count >= 4) {
                 return true;
             } else {
                 p.sendMessage(ChatColor.RED + "상대방의 영토에 4명이상의 플레이어가 접속해있지 않아서, 전쟁 선포가 불가능합니다.");
@@ -121,9 +121,9 @@ public class War {
 
     // 전쟁 시작
     private void startWar(String myPirateaName, String targetPirateName) {
-        sendMessagePiratePlayer(myPirateaName, ChatColor.GREEN + targetPirateName + ChatColor.GREEN + "에게 전쟁을 선포하였습니다." +
+        sendMessagePiratePlayer(myPirateaName, EventUtil.getColoredPirateName(targetPirateName) + ChatColor.GREEN + "에게 전쟁을 선포하였습니다." +
                 " 5분뒤에 전쟁이 시작됩니다.");
-        sendMessagePiratePlayer(targetPirateName, ChatColor.GREEN + targetPirateName + ChatColor.GREEN + "이 전쟁을 선포하였습니다." +
+        sendMessagePiratePlayer(targetPirateName, EventUtil.getColoredPirateName(myPirateaName) + ChatColor.GREEN + "이 전쟁을 선포하였습니다." +
                 " 5분뒤에 전쟁이 시작됩니다.");
         BossBar bossBar = Bukkit.createBossBar("전쟁 준비", BarColor.YELLOW, BarStyle.SEGMENTED_10);
 
@@ -134,10 +134,6 @@ public class War {
 
                 @Override
                 public void run() {
-                    if (readyTime == READY_TIME) {
-                        warMap.put(myPirateaName, targetPirateName);
-                        warMap.put(targetPirateName, myPirateaName);
-                    }
                     if ((readyTime -= 1) == 0) {
                         this.cancel();
 
@@ -149,10 +145,12 @@ public class War {
                                 @Override
                                 public void run() {
                                     if (warTime == WAR_TIME) {
+                                        warMap.put(myPirateaName, targetPirateName);
+                                        warMap.put(targetPirateName, myPirateaName);
                                         bossBar.setColor(BarColor.GREEN);
                                         bossBar.setTitle("전쟁 시작");
-                                        sendMessagePiratePlayer(myPirateaName, ChatColor.YELLOW + targetPirateName + "와의 전쟁이 시작되었습니다!");
-                                        sendMessagePiratePlayer(targetPirateName, ChatColor.YELLOW + myPirateaName + "와의 전쟁이 시작되었습니다!");
+                                        sendMessagePiratePlayer(myPirateaName, EventUtil.getColoredPirateName(targetPirateName) + ChatColor.YELLOW +  "와의 전쟁이 시작되었습니다!");
+                                        sendMessagePiratePlayer(targetPirateName, EventUtil.getColoredPirateName(myPirateaName) + ChatColor.YELLOW +  "와의 전쟁이 시작되었습니다!");
                                     }
                                     if ((warTime -= 1) == 0 ||
                                             (!warMap.containsKey(myPirateaName) && !warMap.containsKey(targetPirateName))) {

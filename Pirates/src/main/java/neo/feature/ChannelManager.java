@@ -51,4 +51,9 @@ public class ChannelManager {
         String channelName = playerChannel.get(player);
         return channels.get(channelName);
     }
+
+    public String getChannelName(Player player){
+        String channelName = playerChannel.get(player);
+        return channelName;
+    }
 }

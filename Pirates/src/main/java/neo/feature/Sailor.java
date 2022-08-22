@@ -40,11 +40,17 @@ public class Sailor {
         String captainName = file.getString("pirates." + pirateName
                 + ".captain");
         p.sendMessage(ChatColor.DARK_GRAY + "==============================================");
-        p.sendMessage(ChatColor.DARK_AQUA + pirateName + "해적단");
+        p.sendMessage(EventUtil.getColoredPirateName(pirateName) + ChatColor.DARK_AQUA + "해적단");
         p.sendMessage(ChatColor.YELLOW + "선장 - " + captainName);
-        file.getConfigurationSection("pirates." + pirateName + ".member").getKeys(false)
-                .forEach(sailor ->
-                        p.sendMessage(ChatColor.DARK_PURPLE + "선원 - " + sailor));
+        int x = file.getInt("area." + captainName + ".x1") + 35;
+        int y = file.getInt("area." + captainName + ".y");
+        int z = file.getInt("area." + captainName + ".z1") + 35;
+        p.sendMessage("신호기 좌표 - " + ChatColor.YELLOW + "x: " + x + ", y: " + y +", z: " + z);
+        if(file.get("pirates." + pirateName + ".member") != null) {
+            file.getConfigurationSection("pirates." + pirateName + ".member").getKeys(false)
+                    .forEach(sailor ->
+                            p.sendMessage(ChatColor.DARK_PURPLE + "선원 - " + sailor));
+        }
         p.sendMessage(ChatColor.DARK_GRAY + "==============================================");
     }
 
@@ -57,7 +63,6 @@ public class Sailor {
         // 선장일 경우 파티 사라짐
         if (util.checkCaptain(p.getName())) {
             EventUtil.deleteBorder(p, p.getName());
-            data.saveConfig();
             Set<Player> players =  EventUtil.getPiratePlayers(pirateName);
             for(Player player : players){
                 Main.cM.joinChannel(player, "General");
@@ -65,6 +70,7 @@ public class Sailor {
             }
             file.set("pirates." + pirateName, null);
             file.set("area." + p.getName(), null);
+            data.saveConfig();
         } else {
             Main.cM.joinChannel(p, "General");
             p.playerListName(Component.text(name));
@@ -84,7 +90,7 @@ public class Sailor {
         String captainName = file.getString("pirates." + pirateName
                 + ".captain");
         p.sendMessage(ChatColor.DARK_GRAY + "==============================================");
-        p.sendMessage(ChatColor.AQUA + pirateName + "해적단 - " + ChatColor.YELLOW + captainName);
+        p.sendMessage(ChatColor.AQUA + EventUtil.getColoredPirateName(pirateName) + "해적단 - " + ChatColor.YELLOW + captainName);
         p.sendMessage(ChatColor.DARK_GRAY + "==============================================");
     }
 
@@ -104,8 +110,8 @@ public class Sailor {
                 inviteMap.remove(name);
                 return;
             }
-            p.sendMessage(ChatColor.GREEN + pirateName +"해적단 초대 수락 요청이 처리되었습니다.");
-            p.playerListName(Component.text("[" + pirateName + "해적단]" + p.getName()));
+            p.sendMessage( EventUtil.getColoredPirateName(pirateName) + ChatColor.GREEN + "해적단 초대 수락 요청이 처리되었습니다.");
+            p.playerListName(Component.text("[" + EventUtil.getColoredPirateName(pirateName) + "해적단]" + p.getName()));
 
             file.set("pirates." + pirateName + ".member." + name, name);
             data.saveConfig();
