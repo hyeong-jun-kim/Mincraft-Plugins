@@ -25,7 +25,7 @@ public class Commands implements CommandExecutor {
                 switch (args.length) {
                     case 0:
                         p.sendMessage(ChatColor.YELLOW + "/해적단 초대 (닉네임)" + ChatColor.WHITE + "- 자신의 영토에 (닉네임)을 초대합니다.\n" +
-                                ChatColor.YELLOW + "/해적단 이름 (이름) " + ChatColor.WHITE + "- 해적단 이름을 설정합니다. ( 최대 7글자 )\n" +
+                                ChatColor.YELLOW + "/해적단 생성 (이름) " + ChatColor.WHITE + "- 해당 이름을 가진 해적단을 생성합니다. ( 최대 7글자 )\n" +
                                 ChatColor.YELLOW + "/해적단 추방 (닉네임) " + ChatColor.WHITE + "- (닉네임)을 영토에서 추방합니다.\n" +
                                 ChatColor.YELLOW + "/해적단 정보 " + ChatColor.WHITE + "- 자신의 해적단 인원 목록을 출력합니다.\n" +
                                 ChatColor.YELLOW + "/해적단 탈퇴 " + ChatColor.WHITE + "- 해적단에서 탈퇴합니다.\n" +
@@ -49,10 +49,10 @@ public class Commands implements CommandExecutor {
                         }
                         break;
                     case 2:
-                        if (args[0].equals("초대") || args[0].equals("이름") || args[0].equals("추방")) {
+                        if (args[0].equals("초대") || args[0].equals("생성") || args[0].equals("추방")) {
                             Captain captain = new Captain(p);
 
-                            if(args[0].equals("이름")){
+                            if(args[0].equals("생성")){
                                 String pirateName = args[1];
                                 captain.create(pirateName);
                             }else if(args[0].equals("초대")) {

@@ -1,18 +1,15 @@
 package neo.feature;
 
+import neo.data.AreaData;
 import neo.data.DataManager;
 import neo.main.Main;
 import neo.util.EventUtil;
 import neo.util.Util;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import java.awt.*;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -20,10 +17,14 @@ import java.util.Set;
 public class Sailor {
     Main main;
     Util util;
+    Player p;
+
     static DataManager data = Main.getData();
     static FileConfiguration file = Main.getData().getFile();
+
+    static HashMap<String, String> warMap = Main.getWarMap();
+    static HashMap<String, AreaData> areaMap = Main.getAreaMap();
     static HashMap<String, String> inviteMap = Main.inviteMap;
-    Player p;
 
     public Sailor(Main main, Player p) {
         this.main = main;
@@ -62,15 +63,24 @@ public class Sailor {
 
         // 선장일 경우 파티 사라짐
         if (util.checkCaptain(p.getName())) {
-            EventUtil.deleteBorder(p, p.getName());
+            String captainName = p.getName();
+            EventUtil.deletePirate(p, captainName);
             Set<Player> players =  EventUtil.getPiratePlayers(pirateName);
             for(Player player : players){
                 Main.cM.joinChannel(player, "General");
                 player.playerListName(Component.text(name));
             }
             file.set("pirates." + pirateName, null);
-            file.set("area." + p.getName(), null);
+            file.set("area." + captainName, null);
             data.saveConfig();
+
+            if(areaMap.containsKey(captainName))
+                areaMap.remove(captainName);
+            if (warMap.containsKey(pirateName)) {
+                String targetPirateName = warMap.get(pirateName);
+                warMap.remove(pirateName);
+                warMap.remove(targetPirateName);
+            }
         } else {
             Main.cM.joinChannel(p, "General");
             p.playerListName(Component.text(name));
@@ -81,8 +91,25 @@ public class Sailor {
 
     }
 
+    // 전체 해적단 목록 출력
     public void printCaptainAndPirateName() {
-        String name = p.getName();
+        if(file.get("area") == null)
+            return;
+
+        p.sendMessage(ChatColor.DARK_GRAY + "==============================================");
+        file.getConfigurationSection("area").getKeys(false).stream().forEach(
+                name -> {
+                    String pirateName = util.findPirateName(name);
+                    if(pirateName != null){
+                        String captainName = file.getString("pirates." + pirateName
+                                + ".captain");
+                        p.sendMessage(EventUtil.getColoredPirateName(pirateName) + "해적단 - " + ChatColor.YELLOW + captainName);
+                    }
+                }
+        );
+        p.sendMessage(ChatColor.DARK_GRAY + "==============================================");
+
+        /*String name = p.getName();
         String pirateName = util.findPirateName(name);
         if (pirateName == null)
             return;
@@ -91,7 +118,7 @@ public class Sailor {
                 + ".captain");
         p.sendMessage(ChatColor.DARK_GRAY + "==============================================");
         p.sendMessage(ChatColor.AQUA + EventUtil.getColoredPirateName(pirateName) + "해적단 - " + ChatColor.YELLOW + captainName);
-        p.sendMessage(ChatColor.DARK_GRAY + "==============================================");
+        p.sendMessage(ChatColor.DARK_GRAY + "==============================================");*/
     }
 
     public void joinChatChannels(Player p) {

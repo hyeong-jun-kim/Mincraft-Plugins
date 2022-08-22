@@ -40,6 +40,7 @@ public class Captain {
             p.sendMessage(ChatColor.RED + "이미 존재하는 해적단 이름입니다.");
             return;
         }
+        // 해적단 이름 변경
         if(util.checkUsernameInPirates(pirateName))
             return;
         file.set("pirates." + pirateName + ".captain", p.getName());

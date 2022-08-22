@@ -1,5 +1,6 @@
 package neo.feature;
 
+import com.sun.xml.internal.bind.v2.TODO;
 import neo.data.AreaData;
 import neo.data.DataManager;
 import neo.main.Main;
@@ -35,6 +36,7 @@ public class War {
     static FileConfiguration file = Main.getData().getFile();
     public static HashMap<String, AreaData> areaMap = Main.getAreaMap();
     public static HashMap<String, String> warMap = Main.getWarMap();
+    public static HashMap<String, BossBar> bossBarMap = Main.bossBarMap;
 
     Player p;
     Util util;
@@ -96,27 +98,44 @@ public class War {
     }
 
     private boolean checkPiratePlayerNum(String captain) {
-        AreaData areaData = areaMap.get(captain);
-        if (areaData != null) {
-            int x1 = areaData.x1;
-            int x2 = areaData.x2;
-            int z1 = areaData.z1;
-            int z2 = areaData.z2;
+        String pirateName = EventUtil.findPirateName(captain);
+        if (pirateName == null)
+            return false;
 
-            double count = Bukkit.getOnlinePlayers().stream()
-                    .filter(p -> (x1 <= p.getLocation().getX() && x2 >= p.getLocation().getX())
-                            && (z1 <= p.getLocation().getZ() && z2 >= p.getLocation().getZ()))
-                    .count();
-            // TODO count 숫자 4로 수정하기
-            if (count >= 4) {
-                return true;
-            } else {
-                p.sendMessage(ChatColor.RED + "상대방의 영토에 4명이상의 플레이어가 접속해있지 않아서, 전쟁 선포가 불가능합니다.");
-                return false;
-            }
+        long online_count = EventUtil.getPiratePlayers(pirateName).stream().filter(
+                p -> p.isOnline()
+        ).count();
+
+        // TODO count 숫자 4로 수정하기
+        if (online_count >= 4) {
+            return true;
+        } else {
+            p.sendMessage(ChatColor.RED + "상대방의 영토에 4명이상의 플레이어가 접속해있지 않아서, 전쟁 선포가 불가능합니다.");
+            return false;
         }
-        return false;
     }
+
+                // 영토 안에 있을 경우
+//    EventUtil.getPiratePlayers(captain)
+//        AreaData areaData = areaMap.get(captain);
+//        if (areaData != null) {
+//            int x1 = areaData.x1;
+//            int x2 = areaData.x2;
+//            int z1 = areaData.z1;
+//            int z2 = areaData.z2;
+//
+//            double count = Bukkit.getOnlinePlayers().stream()
+//                    .filter(p -> (x1 <= p.getLocation().getX() && x2 >= p.getLocation().getX())
+//                            && (z1 <= p.getLocation().getZ() && z2 >= p.getLocation().getZ()))
+//                    .count();
+//            if (count >= 1) {
+//                return true;
+//            } else {
+//                p.sendMessage(ChatColor.RED + "상대방의 영토에 4명이상의 플레이어가 접속해있지 않아서, 전쟁 선포가 불가능합니다.");
+//                return false;
+//            }
+//        }
+//        return false;
 
 
     // 전쟁 시작
@@ -126,7 +145,6 @@ public class War {
         sendMessagePiratePlayer(targetPirateName, EventUtil.getColoredPirateName(myPirateaName) + ChatColor.GREEN + "이 전쟁을 선포하였습니다." +
                 " 5분뒤에 전쟁이 시작됩니다.");
         BossBar bossBar = Bukkit.createBossBar("전쟁 준비", BarColor.YELLOW, BarStyle.SEGMENTED_10);
-
         // 전쟁 준비 타이머
         if (readyTask == null) {
             readyTask = new BukkitRunnable() {
@@ -158,6 +176,8 @@ public class War {
                                         warMap.remove(myPirateaName);
                                         warMap.remove(targetPirateName);
                                         bossBar.removeAll();
+                                        bossBarMap.remove(myPirateaName);
+                                        bossBarMap.remove(targetPirateName);
                                     } else {
                                         bossBar.setProgress(warTime / (double) WAR_TIME);
                                     }
