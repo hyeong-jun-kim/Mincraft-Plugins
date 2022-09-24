@@ -1,0 +1,9 @@
+name: stamina
+main: neo.main.Main
+version: 1.0
+api-version: 1.19
+author: hamtser
+commands:
+  이름:
+    usage: /<command>
+    description: 설명
