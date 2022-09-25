@@ -11,10 +11,12 @@ import java.util.HashMap;
 
 public class Main extends JavaPlugin {
     public static DataManager data;
+    public static Main plugin;
     public static HashMap<OfflinePlayer, StaminaBoard> staminaBoards;
 
     @Override
     public void onEnable() {
+        plugin = this;
         data = new DataManager(this);
         staminaBoards = new HashMap<>();
         getServer().getPluginManager().registerEvents(new EventListener(), this);
@@ -24,6 +26,10 @@ public class Main extends JavaPlugin {
     @Override
     public void onDisable() {
 
+    }
+
+    public static Main getPlugin(){
+        return plugin;
     }
 
     public static DataManager getData() {

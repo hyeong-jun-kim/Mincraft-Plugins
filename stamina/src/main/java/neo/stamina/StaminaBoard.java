@@ -1,21 +1,59 @@
 package neo.stamina;
 
+import neo.config.StaminaConfig;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.*;
 
 public class StaminaBoard {
-    public Scoreboard board;
-    public Objective o;
-    public Score score;
+    private Stamina stamina;
+    private String prevStaminaScore = " ";
+    private Scoreboard board;
+    private Objective o;
+    private Score score;
 
     private Player p;
 
-    StaminaBoard(Player p, Scoreboard board, Objective o, Score score){
+    StaminaBoard(Player p, Stamina stamina) {
         this.p = p;
-        this.board = board;
-        this.o = o;
-        this.score = score;
+        this.stamina = stamina;
+        addStaminaBoard(p);
+    }
+
+    public void addStaminaBoard(Player p) {
+        String name = p.getName();
+        Scoreboard board = Bukkit.getServer().getScoreboardManager().getNewScoreboard();
+        Objective o = board.registerNewObjective(name + ".stamina", Criteria.DUMMY, "상태 창");
+        o.setDisplaySlot(DisplaySlot.SIDEBAR);
+        score = board.getObjective(name + ".stamina").getScore("스태미나");
+        p.setScoreboard(board);
+    }
+
+    public void setScore(Double staminaCoolDown) {
+        double staminaValue = StaminaConfig.STAMINA_MAX / 10;
+        String name = p.getName();
+        board = p.getScoreboard();
+
+
+        StringBuilder sb = new StringBuilder("□□□□□□□□□□");
+        int cnt = 0;
+        double tmp = 0;
+
+        for (int i = 0; i < 10; i++) {
+            if (staminaCoolDown >= tmp && staminaCoolDown < tmp + staminaValue) {
+                break;
+            }
+            cnt++;
+            tmp += staminaValue;
+        }
+
+        for (int i = 0; i < cnt; i++) {
+            sb.setCharAt(i, '■');
+        }
+
+        board.resetScores(prevStaminaScore);
+        Score score = board.getObjective(name + ".stamina").getScore("스태미나: " + sb.toString());
+        score.setScore(staminaCoolDown.intValue());
+        prevStaminaScore = "스태미나: " + sb.toString();
     }
 }
