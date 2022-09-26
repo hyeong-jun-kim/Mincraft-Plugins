@@ -1,11 +1,12 @@
-package neo.stamina;
+package neo.feature;
 
 import neo.config.StaminaConfig;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 
-public class StaminaBoard {
+public class StaminaBoard implements Board {
     private Stamina stamina;
     private String prevStaminaScore = " ";
     private Scoreboard board;
@@ -23,7 +24,7 @@ public class StaminaBoard {
     public void addBoard(Player p) {
         String name = p.getName();
         Scoreboard board = Bukkit.getServer().getScoreboardManager().getNewScoreboard();
-        Objective o = board.registerNewObjective(name + ".status", Criteria.DUMMY, "상태 창");
+        Objective o = board.registerNewObjective(name + ".status", Criteria.DUMMY, ChatColor.GOLD + "상태 창");
         o.setDisplaySlot(DisplaySlot.SIDEBAR);
         score = board.getObjective(name + ".status").getScore("스태미나");
         p.setScoreboard(board);
@@ -52,8 +53,8 @@ public class StaminaBoard {
         }
 
         board.resetScores(prevStaminaScore);
-        Score score = board.getObjective(name + ".status").getScore("스태미나: " + sb.toString());
+        Score score = board.getObjective(name + ".status").getScore("스태미나: " + ChatColor.GREEN + sb.toString());
         score.setScore(staminaCoolDown.intValue());
-        prevStaminaScore = "스태미나: " + sb.toString();
+        prevStaminaScore = "스태미나: " + ChatColor.GREEN + sb.toString();
     }
 }

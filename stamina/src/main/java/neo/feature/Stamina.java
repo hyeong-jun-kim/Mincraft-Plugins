@@ -1,4 +1,4 @@
-package neo.stamina;
+package neo.feature;
 
 import neo.config.StaminaConfig;
 import neo.main.Main;
@@ -9,8 +9,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
-public class Stamina {
-    final Double STAMINA_MAX = StaminaConfig.STAMINA_MAX;
+public class Stamina{
+    final double STAMINA_MAX = StaminaConfig.STAMINA_MAX;
     Player p;
     private Long currentTime;
     private BukkitTask bukkitTask;
@@ -34,7 +34,7 @@ public class Stamina {
         this.staminaCoolDown = staminaCoolDown;
     }
 
-    public void setLastEventTime(Long lastEventTime) {
+    public void setLastEventTime(long lastEventTime) {
         this.lastEventTime = lastEventTime;
     }
 
@@ -43,7 +43,11 @@ public class Stamina {
         staminaBoard.setScore(staminaCoolDown);
     }
 
-    public Long getLastEventTime(){
+    public void setCoolDownMax(){
+        this.staminaCoolDown = STAMINA_MAX;
+    }
+
+    public long getLastEventTime(){
         return lastEventTime;
     }
 
@@ -75,7 +79,6 @@ public class Stamina {
                     staminaCoolDown += 0.5;
                 }
             }
-            p.sendMessage(staminaCoolDown.toString());
             staminaBoard.setScore(staminaCoolDown);
         }, 0L, 10L);
     }

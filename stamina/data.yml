@@ -1,3 +1,8 @@
 stamina:
   max: 20 # 스태미너 꽉 차는데 걸리는 시간
   recoveryTime: 2 # 스태미너 회복하기까지 걸리는 시간
+thirsty:
+  max: 20 # 갈증 총 시간
+  reduceTime: 2; # 갈증 줄어드는 시간
+  waterHeal: 5 # 증류수 차는 칸수
+  damage: 0.5 # 갈증상태 일 때 데미지

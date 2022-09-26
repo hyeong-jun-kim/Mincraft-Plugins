@@ -1,9 +1,8 @@
 package neo.main;
 
 import neo.data.DataManager;
-import neo.event.StaminaEventListener;
-import neo.event.ThirstyEventListener;
-import neo.stamina.StaminaBoard;
+import neo.event.EventListener;
+import neo.feature.StaminaBoard;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -11,11 +10,9 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
-import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
@@ -34,8 +31,7 @@ public class Main extends JavaPlugin {
         data = new DataManager(this);
         staminaBoards = new HashMap<>();
         initRecipeBottle();
-        getServer().getPluginManager().registerEvents(new StaminaEventListener(), this);
-        getServer().getPluginManager().registerEvents(new ThirstyEventListener(), this);
+        getServer().getPluginManager().registerEvents(new EventListener(), this);
 //        getCommand("커맨드").setExecutor(new Commands());
     }
 
