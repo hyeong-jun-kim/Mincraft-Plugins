@@ -17,15 +17,15 @@ public class StaminaBoard {
     StaminaBoard(Player p, Stamina stamina) {
         this.p = p;
         this.stamina = stamina;
-        addStaminaBoard(p);
+        addBoard(p);
     }
 
-    public void addStaminaBoard(Player p) {
+    public void addBoard(Player p) {
         String name = p.getName();
         Scoreboard board = Bukkit.getServer().getScoreboardManager().getNewScoreboard();
-        Objective o = board.registerNewObjective(name + ".stamina", Criteria.DUMMY, "상태 창");
+        Objective o = board.registerNewObjective(name + ".status", Criteria.DUMMY, "상태 창");
         o.setDisplaySlot(DisplaySlot.SIDEBAR);
-        score = board.getObjective(name + ".stamina").getScore("스태미나");
+        score = board.getObjective(name + ".status").getScore("스태미나");
         p.setScoreboard(board);
     }
 
@@ -52,7 +52,7 @@ public class StaminaBoard {
         }
 
         board.resetScores(prevStaminaScore);
-        Score score = board.getObjective(name + ".stamina").getScore("스태미나: " + sb.toString());
+        Score score = board.getObjective(name + ".status").getScore("스태미나: " + sb.toString());
         score.setScore(staminaCoolDown.intValue());
         prevStaminaScore = "스태미나: " + sb.toString();
     }

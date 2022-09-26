@@ -1,6 +1,5 @@
 package neo.event;
 
-import neo.config.StaminaConfig;
 import neo.main.Main;
 import neo.stamina.Stamina;
 import neo.stamina.StaminaBoard;
@@ -9,16 +8,14 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
 import org.bukkit.scoreboard.*;
 
 import java.util.HashMap;
-import java.util.Set;
 
 import static org.bukkit.event.player.PlayerAnimationType.ARM_SWING;
 
-public class EventListener implements Listener {
+public class StaminaEventListener implements Listener {
     HashMap<OfflinePlayer, StaminaBoard> staminaBoards = Main.getStaminaBoards();
     HashMap<String, Stamina> staminas = new HashMap<String, Stamina>();
 //    HashMap<Player, Double> staminaCoolDowns = new HashMap<>();
@@ -31,7 +28,7 @@ public class EventListener implements Listener {
             staminas.put(name, new Stamina(p));
         }else{
             Stamina stamina = staminas.get(p.getName());
-            double leftStaminaCoolDown = stamina.getStaminaCoolDown();
+            double leftStaminaCoolDown = stamina.getCoolDown();
             staminas.put(name, new Stamina(p, leftStaminaCoolDown));
         }
     }
@@ -43,7 +40,7 @@ public class EventListener implements Listener {
 
         if(staminas.containsKey(name)){
             Stamina stamina = staminas.get(name);
-            stamina.cancelStaminaScheduler();
+            stamina.cancelScheduler();
         }
     }
 
@@ -62,12 +59,12 @@ public class EventListener implements Listener {
             Long currentTime = System.currentTimeMillis();
             Double leftTime = (currentTime - lastTime) / 1000d;
             if(leftTime <= 0.5){ // 0.5 초 이내에 클릭
-                Double staminaCoolDown = stamina.getStaminaCoolDown();
+                Double staminaCoolDown = stamina.getCoolDown();
                 if(staminaCoolDown > 0){
                     if((staminaCoolDown) - leftTime < 0){
-                        stamina.setStaminaCoolDown(0d);
+                        stamina.setCoolDown(0d);
                     }else{
-                        stamina.setStaminaCoolDown(staminaCoolDown - leftTime);
+                        stamina.setCoolDown(staminaCoolDown - leftTime);
                     }
                 }
             }
@@ -104,5 +101,4 @@ public class EventListener implements Listener {
         Score score = board.getObjective(name+ ".stamina").getScore("stamina: ■■■■■");
         p.setScoreboard(board);
     }
-
 }

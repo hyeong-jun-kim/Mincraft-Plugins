@@ -8,7 +8,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.Scoreboard;
 
 public class Stamina {
     final Double STAMINA_MAX = StaminaConfig.STAMINA_MAX;
@@ -24,13 +23,13 @@ public class Stamina {
 
     public Stamina(Player p){
         this.p = p;
-        runStaminaScheduler();
+        runScheduler();
         staminaBoard = new StaminaBoard(p, this);
         staminaCoolDown = STAMINA_MAX;
     }
     public Stamina(Player p, double staminaCoolDown){
         this.p = p;
-        runStaminaScheduler();
+        runScheduler();
         staminaBoard = new StaminaBoard(p, this);
         this.staminaCoolDown = staminaCoolDown;
     }
@@ -39,7 +38,7 @@ public class Stamina {
         this.lastEventTime = lastEventTime;
     }
 
-    public void setStaminaCoolDown(Double staminaCoolDown){
+    public void setCoolDown(Double staminaCoolDown){
         this.staminaCoolDown = staminaCoolDown;
         staminaBoard.setScore(staminaCoolDown);
     }
@@ -48,17 +47,17 @@ public class Stamina {
         return lastEventTime;
     }
 
-    public Double getStaminaCoolDown(){
+    public Double getCoolDown(){
         return staminaCoolDown;
     }
 
-    public void cancelStaminaScheduler(){
+    public void cancelScheduler(){
         bukkitTask.cancel();
     }
 
     // 아무것도 안할 때 스태미나 증가 스케쥴러
     // TODO 왼쪽 클릭 누를 때 스케쥴러 잠시 중지
-    public void runStaminaScheduler(){
+    public void runScheduler(){
         bukkitTask = scheduler.runTaskTimer(plugin, () -> {
             currentTime = System.currentTimeMillis();
             Double lastTime = (currentTime - lastEventTime) / 1000d;
