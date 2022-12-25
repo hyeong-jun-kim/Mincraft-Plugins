@@ -1,0 +1,7 @@
+data:
+  1:
+    run_command: command # 실행 할 커맨드 이름을 입력해주세요. ps) %player를 적으면 플레이어의 이름이 적힙니다.
+    item: item_name # 아이템 이름을 입력해 주세요.
+    count: item_count # 아이템 갯수를 입력해 주세요.
+    item_command: command # 아이템을 가지고 있을 때 실행 될 커맨드를 입력해주세요.
+    common_command: command # 아이템이 없을 때 실행 될 커맨드를 입력해주세요.
