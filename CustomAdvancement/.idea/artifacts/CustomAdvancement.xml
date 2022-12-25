@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="CustomAdvancement">
+    <output-path>$PROJECT_DIR$/../../서버/spigot_1.12.2/plugins</output-path>
+    <root id="archive" name="CustomAdvancement.jar">
+      <element id="module-output" name="template" />
+      <element id="file-copy" path="$PROJECT_DIR$/data.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/java/plugin.yml" />
+    </root>
+  </artifact>
+</component>

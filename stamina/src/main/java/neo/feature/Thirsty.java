@@ -41,7 +41,13 @@ public class Thirsty{
     }
 
     public void drinkWater(){
-        this.thirstyCoolDown += WATER_HEAL;
+        double sum = this.thirstyCoolDown + WATER_HEAL;
+
+        if(sum > THIRSTY_MAX){
+            this.thirstyCoolDown = THIRSTY_MAX;
+        }else{
+            this.thirstyCoolDown += WATER_HEAL;
+        }
     }
 
     public double getCoolDown(){

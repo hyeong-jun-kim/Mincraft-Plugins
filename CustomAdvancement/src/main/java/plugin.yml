@@ -1,0 +1,12 @@
+name: CustomAdvancement
+main: neo.main.Main
+version: 1.0
+api-version: 1.12.2
+author: hamtser
+commands:
+  advmsg:
+    usage: /<command>
+    description: 설명
+  advrem:
+    usage: /<command>
+    description: 설명

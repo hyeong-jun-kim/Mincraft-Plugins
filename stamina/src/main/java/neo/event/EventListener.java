@@ -146,7 +146,7 @@ public class EventListener implements Listener {
                     p.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "증류수를 마셨습니다.");
                     Thirsty thirsty = thirsty_map.get(p.getName());
                     thirsty.drinkWater();
-                    p.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
+                    p.getInventory().setItemInMainHand(new ItemStack(Material.GLASS_BOTTLE));
                 }
             }
         }
