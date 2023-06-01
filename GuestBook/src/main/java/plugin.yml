@@ -1,0 +1,9 @@
+name: guestbook
+main: neo.main.Main
+version: 1.0
+api-version: 1.19
+author: neo
+commands:
+  이름:
+    usage: /<command>
+    description: 설명
