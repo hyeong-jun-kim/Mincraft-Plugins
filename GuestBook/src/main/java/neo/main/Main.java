@@ -5,11 +5,12 @@ import neo.event.EventListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
-    public static DataManager data;
+    public static Main instance;
 
     @Override
     public void onEnable() {
-        data = new DataManager(this);
+        instance = this;
+//        data = new DataManager(this);
 //        getServer().getPluginManager().registerEvents(new EventListener(), this);
         getCommand("방명록").setExecutor(new Commands());
     }
@@ -18,10 +19,5 @@ public class Main extends JavaPlugin {
     public void onDisable() {
 
     }
-
-    public static DataManager getData() {
-        return data;
-    }
-
 }
 

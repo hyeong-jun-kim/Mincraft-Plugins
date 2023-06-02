@@ -4,6 +4,7 @@ version: 1.0
 api-version: 1.19
 author: neo
 commands:
-  이름:
+  방명록:
     usage: /<command>
     description: 설명
+    aliases: [qkdaudfhr]
