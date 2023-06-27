@@ -1,0 +1,10 @@
+name: Vault-Check
+main: neo.main.Main
+version: 1.0
+api-version: 1.16
+author: hamster
+softdepend: [Vault,ST-Money]
+commands:
+  수표:
+    usage: /<command>
+    description: 설명

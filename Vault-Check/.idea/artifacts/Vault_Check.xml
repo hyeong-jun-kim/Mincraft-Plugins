@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Vault-Check">
+    <output-path>$PROJECT_DIR$/../../코딩/마인크래프트/서버/paper_1.16.5/plugins</output-path>
+    <root id="archive" name="Vault-Check.jar">
+      <element id="module-output" name="template" />
+      <element id="file-copy" path="$PROJECT_DIR$/data.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/java/plugin.yml" />
+    </root>
+  </artifact>
+</component>
